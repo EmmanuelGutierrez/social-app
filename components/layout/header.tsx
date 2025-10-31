@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 // import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import logo from "../../media/logo/logo-dark-transparent.png";
 import Image from "next/image";
-export const Header = () => {
+export const Header = async () => {
   return (
     <header className=" h-18 flex justify-between px-20 items-center border-b">
       <div>

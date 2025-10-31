@@ -6,10 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:watch": "graphql-codegen --watch",
+    "generate": "graphql-codegen",
+    "generate:verbose": "graphql-codegen --verbose"
   },
   "dependencies": {
     "@apollo/client": "^4.0.8",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
@@ -25,6 +29,14 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@eddeee888/gcg-typescript-resolver-files": "^0.14.0",
+    "@graphql-codegen/cli": "^6.0.1",
+    "@graphql-codegen/client-preset": "^5.1.1",
+    "@graphql-codegen/typed-document-node": "^6.1.0",
+    "@graphql-codegen/typescript": "^5.0.2",
+    "@graphql-codegen/typescript-operations": "^5.0.2",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.3",
+    "@parcel/watcher": "^2.5.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

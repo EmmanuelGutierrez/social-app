@@ -1,0 +1,45 @@
+query MeQuery {
+  meQuery {
+    _id
+    email
+    followers {
+      followDate
+      user {
+        _id
+        name
+        lastname
+        profileImg {
+          secure_url
+          url
+          _id
+        }
+        username
+      }
+      _id
+    }
+    following {
+      followDate
+      user {
+        _id
+        name
+        lastname
+        profileImg {
+          secure_url
+          url
+          _id
+        }
+        username
+      }
+      _id
+    }
+    lastname
+    name
+    profileImg {
+      _id
+      secure_url
+      url
+    }
+    role
+    username
+  }
+}
