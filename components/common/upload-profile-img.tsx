@@ -1,0 +1,144 @@
+"use client";
+import { useState, useRef } from "react";
+import { Pencil, X, Plus } from "lucide-react";
+import Image from "next/image";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { ControllerRenderProps } from "react-hook-form";
+import * as z from "zod";
+
+interface AvatarUploadEditButtonI {
+  field: ControllerRenderProps<
+    {
+      email: string;
+      password: string;
+      name: string;
+      lastname: string;
+      username: string;
+      birth_date: Date;
+      file: z.core.File;
+    },
+    "file"
+  >;
+}
+
+export default function AvatarUploadEditButton({
+  field,
+}: AvatarUploadEditButtonI) {
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!validTypes.includes(file.type)) {
+      alert("Solo se aceptan JPG, PNG o WebP");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("La imagen no debe superar 5MB");
+      return;
+    }
+    field.onChange(file);
+    if (file) {
+      console.log("FILE CH", file);
+      setPreview(URL.createObjectURL(file));
+    }
+
+    // const reader = new FileReader();
+    // reader.onloadend = () => {
+    //   setPreview(reader.result as string);
+    // };
+    // reader.readAsDataURL(file);
+  };
+
+  const handleEditClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const clearImage = () => {
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center">
+      {/* Avatar Circle with Edit Button */}
+      <div className="relative inline-block">
+        <div className="w-32 h-32 rounded-full bg-linear-to-br from-muted to-muted/50 border-2 border-border flex items-center justify-center overflow-hidden">
+          {preview ? (
+            <Image
+              src={preview}
+              alt="Avatar"
+              width={130}
+              height={130}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Plus className="w-8 h-8 text-white" />
+          )}
+        </div>
+
+        {/* Edit Button on Bottom Right */}
+        <Button
+          onClick={handleEditClick}
+          type="button"
+          className="absolute bottom-0 right-0 p-2.5 bg-accent hover:bg-accent/90 rounded-full transition-colors shadow-lg border-2 border-background"
+          title="Cambiar foto"
+        >
+          <Pencil className="h-5 w-5 text-accent-foreground" />
+        </Button>
+
+        {/* Clear Button */}
+        {preview && (
+          <Button
+            onClick={clearImage}
+            className="absolute -top-2 -right-2 p-1 bg-destructive hover:bg-destructive/90 rounded-full transition-colors shadow-lg"
+          >
+            <X className="h-4 w-4 text-destructive-foreground" />
+          </Button>
+        )}
+      </div>
+
+      {/* Hidden Input */}
+      <Input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        onChange={(e) => {
+          handleImageChange(e.target.files);
+          
+        }}
+        className="hidden"
+      />
+      {/* <Input
+        {...field}
+        ref={field.ref}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="hidden"
+        id="file"
+        name={field.name}
+        // ref={field.ref}
+        multiple={false}
+        onBlur={field.onBlur}
+        onChange={(e) => {
+          console.log("file eve", e.target);
+          const files = e.target.files;
+          handleImageChange(files);
+          if (files) {
+            // console.log('files',files[0].arrayBuffer)
+            field.onChange(files[0]);
+            setPreview(URL.createObjectURL(files[0]));
+          }
+        }}
+      /> */}
+    </div>
+  );
+}
