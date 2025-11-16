@@ -6,7 +6,7 @@ import Image from "next/image";
 import { UserDropdown } from "../user/user-dropdown";
 export const Header =  () => {
   return (
-    <header className=" h-18 flex justify-between px-20 items-center border-b">
+    <header className=" h-18 flex justify-between px-20 items-center border-b border-border/20">
       <div>
         <Button className="h-full" variant={"ghost"}>
           <Image alt="logo" src={logo} height={110} width={110} />

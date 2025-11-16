@@ -1,0 +1,20 @@
+mutation createPostMutation($data: CreatePostInput!, $files: UploadInputArray!) {
+  createPost(data: $data, files: $files) {
+    body
+    _id
+    createdAt
+    tags
+    title
+    replyTo {
+      _id
+      authorId {
+        _id
+      }
+    }
+    images {
+      _id
+      secure_url
+      original_filename
+    }
+  }
+}

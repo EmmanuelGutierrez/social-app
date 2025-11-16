@@ -14,14 +14,18 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "mutation createPostMutation($data: CreatePostInput!, $files: UploadInputArray!) {\n  createPost(data: $data, files: $files) {\n    body\n    _id\n    createdAt\n    tags\n    title\n    replyTo {\n      _id\n      authorId {\n        _id\n      }\n    }\n    images {\n      _id\n      secure_url\n      original_filename\n    }\n  }\n}": typeof types.CreatePostMutationDocument,
     "mutation LoginMutation($loginInput: LoginInput!) {\n  login(loginInput: $loginInput) {\n    tokenWs\n  }\n}": typeof types.LoginMutationDocument,
-    "mutation registerMutation($register: CreateUserInput!, $file: Upload) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}": typeof types.RegisterMutationDocument,
+    "mutation LogoutMutation {\n  logout\n}": typeof types.LogoutMutationDocument,
+    "mutation registerMutation($register: CreateUserInput!, $file: UploadInput!) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}": typeof types.RegisterMutationDocument,
     "query MeQuery {\n  meQuery {\n    _id\n    createdAt\n    updatedAt\n    email\n    followers {\n      followDate\n      user {\n        _id\n        name\n        lastname\n        profileImg {\n          secure_url\n          url\n          _id\n        }\n        username\n      }\n      _id\n    }\n    following {\n      followDate\n      user {\n        _id\n        name\n        lastname\n        profileImg {\n          secure_url\n          url\n          _id\n        }\n        username\n      }\n      _id\n    }\n    lastname\n    name\n    profileImg {\n      _id\n      secure_url\n      url\n    }\n    role\n    username\n  }\n}": typeof types.MeQueryDocument,
     "query RotateAccessToken {\n  rotateAccessToken {\n    tokenWs\n  }\n}": typeof types.RotateAccessTokenDocument,
 };
 const documents: Documents = {
+    "mutation createPostMutation($data: CreatePostInput!, $files: UploadInputArray!) {\n  createPost(data: $data, files: $files) {\n    body\n    _id\n    createdAt\n    tags\n    title\n    replyTo {\n      _id\n      authorId {\n        _id\n      }\n    }\n    images {\n      _id\n      secure_url\n      original_filename\n    }\n  }\n}": types.CreatePostMutationDocument,
     "mutation LoginMutation($loginInput: LoginInput!) {\n  login(loginInput: $loginInput) {\n    tokenWs\n  }\n}": types.LoginMutationDocument,
-    "mutation registerMutation($register: CreateUserInput!, $file: Upload) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}": types.RegisterMutationDocument,
+    "mutation LogoutMutation {\n  logout\n}": types.LogoutMutationDocument,
+    "mutation registerMutation($register: CreateUserInput!, $file: UploadInput!) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}": types.RegisterMutationDocument,
     "query MeQuery {\n  meQuery {\n    _id\n    createdAt\n    updatedAt\n    email\n    followers {\n      followDate\n      user {\n        _id\n        name\n        lastname\n        profileImg {\n          secure_url\n          url\n          _id\n        }\n        username\n      }\n      _id\n    }\n    following {\n      followDate\n      user {\n        _id\n        name\n        lastname\n        profileImg {\n          secure_url\n          url\n          _id\n        }\n        username\n      }\n      _id\n    }\n    lastname\n    name\n    profileImg {\n      _id\n      secure_url\n      url\n    }\n    role\n    username\n  }\n}": types.MeQueryDocument,
     "query RotateAccessToken {\n  rotateAccessToken {\n    tokenWs\n  }\n}": types.RotateAccessTokenDocument,
 };
@@ -43,11 +47,19 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "mutation createPostMutation($data: CreatePostInput!, $files: UploadInputArray!) {\n  createPost(data: $data, files: $files) {\n    body\n    _id\n    createdAt\n    tags\n    title\n    replyTo {\n      _id\n      authorId {\n        _id\n      }\n    }\n    images {\n      _id\n      secure_url\n      original_filename\n    }\n  }\n}"): (typeof documents)["mutation createPostMutation($data: CreatePostInput!, $files: UploadInputArray!) {\n  createPost(data: $data, files: $files) {\n    body\n    _id\n    createdAt\n    tags\n    title\n    replyTo {\n      _id\n      authorId {\n        _id\n      }\n    }\n    images {\n      _id\n      secure_url\n      original_filename\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "mutation LoginMutation($loginInput: LoginInput!) {\n  login(loginInput: $loginInput) {\n    tokenWs\n  }\n}"): (typeof documents)["mutation LoginMutation($loginInput: LoginInput!) {\n  login(loginInput: $loginInput) {\n    tokenWs\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation registerMutation($register: CreateUserInput!, $file: Upload) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}"): (typeof documents)["mutation registerMutation($register: CreateUserInput!, $file: Upload) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}"];
+export function gql(source: "mutation LogoutMutation {\n  logout\n}"): (typeof documents)["mutation LogoutMutation {\n  logout\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation registerMutation($register: CreateUserInput!, $file: UploadInput!) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}"): (typeof documents)["mutation registerMutation($register: CreateUserInput!, $file: UploadInput!) {\n  register(register: $register, file: $file) {\n    tokenWs\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

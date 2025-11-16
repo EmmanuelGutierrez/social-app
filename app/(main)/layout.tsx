@@ -9,7 +9,7 @@ export default function RootLayout({
   return (
     <div>
       <Header />
-      <div className="min-h-[calc(100dvh-(--spacing(18)))] w-screen">
+      <div className="min-h-[calc(100dvh-(--spacing(18)))] w-full">
         {children}
       </div>
       {/* <Footer /> */}

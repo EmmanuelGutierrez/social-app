@@ -18,7 +18,6 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { useAuth } from "@/hooks/useAuth";
-import { useAuthTest } from "./authTest";
 import {useRouter } from "next/navigation";
 
 const formSchema = z.object({
@@ -29,8 +28,6 @@ const formSchema = z.object({
 export function LoginForm() {
   // const [loading, setLoading] = useState(false);
   const router=useRouter()
-  const authTest = useAuthTest((state) => state);
-  console.log("authTest", authTest);
   const { handleSubmit, control } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "", password: "" },
@@ -75,16 +72,6 @@ export function LoginForm() {
       // setLoading(false);
     }
   }
-  // const [login, { loading }] = useMutation(LOGIN_MUTATION, {
-  //   onCompleted: (data) => {
-  //     // Store token and redirect
-  //     localStorage.setItem("authToken", data.login.token)
-  //     window.location.href = "/dashboard"
-  //   },
-  //   onError: (error) => {
-  //     setError(error.message)
-  //   },
-  // })
 
   return (
     <Card className="w-full bg-transparent text-white">

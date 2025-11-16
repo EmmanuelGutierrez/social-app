@@ -3,6 +3,7 @@ import {
   CreateUserInput,
   LoginInput,
   LoginMutationDocument,
+  LogoutMutationDocument,
   MeQueryDocument,
   RegisterMutationDocument,
 } from "@/graphql/types/graphql";
@@ -22,16 +23,33 @@ export const useAuthStore = <T>(selector: (store: AuthStore) => T): T => {
 
 export const useAuth = () => {
   const authStore = useAuthStore((state) => state);
-  const [loginMutation, loginData] = useMutation(LoginMutationDocument, {
-    client: apolloClient,
-  });
   const [registerMutation, registerData] = useMutation(
     RegisterMutationDocument,
     {
       client: apolloClient,
+      onCompleted: async (data) => {
+        if (authStore && data?.register.tokenWs) {
+          localStorage.setItem("tokenWs", data.register.tokenWs);
+          const meRes = await meQuery();
+          setUser(meRes.data?.meQuery);
+        }
+      },
     }
   );
   const [meQuery, meData] = useLazyQuery(MeQueryDocument, {
+    client: apolloClient,
+  });
+  const [loginMutation, loginData] = useMutation(LoginMutationDocument, {
+    client: apolloClient,
+    onCompleted: async (data) => {
+      if (authStore && data?.login.tokenWs) {
+        localStorage.setItem("tokenWs", data.login.tokenWs);
+        const meRes = await meQuery();
+        setUser(meRes.data?.meQuery);
+      }
+    },
+  });
+  const [logoutMutation] = useMutation(LogoutMutationDocument, {
     client: apolloClient,
   });
 
@@ -57,27 +75,23 @@ export const useAuth = () => {
     setUser(data?.meQuery);
   };
 
-  const login = async (loginData: LoginInput) => {
-    const data = await loginMutation({
-      variables: { loginInput: loginData },
-    });
-    if (data.data?.login.tokenWs) {
-      localStorage.setItem("tokenWs", data.data.login.tokenWs);
-      await getMe();
-    }
+  const login = (loginData: LoginInput) => {
+    return loginMutation({ variables: { loginInput: loginData } });
   };
 
-  const register = async (input: CreateUserInput, file?: File) => {
-    const data = await registerMutation({
-      variables: { register: input, file },
+  const register =  (input: CreateUserInput, file?: File) => {
+    return registerMutation({
+      variables: {
+        register: input,
+        file: {
+          file,
+        },
+      },
     });
-    if (data.data?.register.tokenWs) {
-      localStorage.setItem("tokenWs", data.data.register.tokenWs);
-      await getMe();
-    }
   };
 
   const logoutUser = async () => {
+    await logoutMutation();
     logout();
   };
 

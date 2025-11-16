@@ -97,6 +97,7 @@ export type Mutation = {
   createPost: Post;
   followUser: Scalars['Boolean']['output'];
   login: AuthReturnDto;
+  logout: Scalars['Boolean']['output'];
   register: AuthReturnDto;
   updatePost: Post;
   updateReaction: Post;
@@ -105,7 +106,7 @@ export type Mutation = {
 
 export type MutationCreatePostArgs = {
   data: CreatePostInput;
-  files?: InputMaybe<Array<Scalars['Upload']['input']>>;
+  files: UploadInputArray;
 };
 
 
@@ -120,7 +121,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterArgs = {
-  file?: InputMaybe<Scalars['Upload']['input']>;
+  file: UploadInput;
   register: CreateUserInput;
 };
 
@@ -210,6 +211,14 @@ export type UpdatePostInput = {
   id: Scalars['String']['input'];
 };
 
+export type UploadInput = {
+  file?: InputMaybe<Scalars['Upload']['input']>;
+};
+
+export type UploadInputArray = {
+  files?: InputMaybe<Scalars['Upload']['input']>;
+};
+
 export type User = {
   __typename?: 'User';
   _id: Scalars['ID']['output'];
@@ -231,6 +240,14 @@ export enum Roles {
   User = 'USER'
 }
 
+export type CreatePostMutationMutationVariables = Exact<{
+  data: CreatePostInput;
+  files: UploadInputArray;
+}>;
+
+
+export type CreatePostMutationMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', body: string, _id: string, createdAt: number, tags: Array<string>, title?: string | null, replyTo?: { __typename?: 'Post', _id: string, authorId: { __typename?: 'User', _id: string } } | null, images?: Array<{ __typename?: 'File', _id: string, secure_url: string, original_filename: string }> | null } };
+
 export type LoginMutationMutationVariables = Exact<{
   loginInput: LoginInput;
 }>;
@@ -238,9 +255,14 @@ export type LoginMutationMutationVariables = Exact<{
 
 export type LoginMutationMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthReturnDto', tokenWs: string } };
 
+export type LogoutMutationMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutationMutation = { __typename?: 'Mutation', logout: boolean };
+
 export type RegisterMutationMutationVariables = Exact<{
   register: CreateUserInput;
-  file?: InputMaybe<Scalars['Upload']['input']>;
+  file: UploadInput;
 }>;
 
 

@@ -117,28 +117,7 @@ export default function AvatarUploadEditButton({
         }}
         className="hidden"
       />
-      {/* <Input
-        {...field}
-        ref={field.ref}
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        className="hidden"
-        id="file"
-        name={field.name}
-        // ref={field.ref}
-        multiple={false}
-        onBlur={field.onBlur}
-        onChange={(e) => {
-          console.log("file eve", e.target);
-          const files = e.target.files;
-          handleImageChange(files);
-          if (files) {
-            // console.log('files',files[0].arrayBuffer)
-            field.onChange(files[0]);
-            setPreview(URL.createObjectURL(files[0]));
-          }
-        }}
-      /> */}
+    
     </div>
   );
 }

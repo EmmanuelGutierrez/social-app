@@ -10,9 +10,16 @@ import {
 } from "../ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
+import { useEffect } from "react";
 
 export const UserDropdown = () => {
-  const { user, logoutUser } = useAuth();
+  const { user, logoutUser, getMe, hasHydrated } = useAuth();
+  useEffect(() => {
+    if (hasHydrated) {
+      getMe();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasHydrated]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>

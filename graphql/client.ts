@@ -1,6 +1,9 @@
 import { InMemoryCache, Observable } from "@apollo/client";
-import { ApolloClient, } from "@apollo/client";
-import { RotateAccessTokenDocument } from "./types/graphql";
+import { ApolloClient } from "@apollo/client";
+import {
+  LogoutMutationDocument,
+  RotateAccessTokenDocument,
+} from "./types/graphql";
 import { ErrorLink } from "@apollo/client/link/error";
 import { ApolloLink } from "@apollo/client";
 import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
@@ -24,6 +27,7 @@ export const apolloClientPlain = new ApolloClient({
 
 async function refreshAccessToken() {
   try {
+    
     const { data } = await apolloClientPlain.query({
       query: RotateAccessTokenDocument,
     });
@@ -31,8 +35,15 @@ async function refreshAccessToken() {
       localStorage.setItem("tokenWs", data?.rotateAccessToken.tokenWs);
       return true;
     }
+    await apolloClientPlain.mutate({
+      mutation: LogoutMutationDocument,
+    });
     return false;
   } catch (error) {
+    sessionStorage.clear();
+    await apolloClientPlain.mutate({
+      mutation: LogoutMutationDocument,
+    });
     console.log("ERROR", error);
     return false;
   }
@@ -42,12 +53,14 @@ const errorLink = new ErrorLink(({ forward, error, operation }) => {
   if (!error) {
     return;
   }
-  if (error.name.toLowerCase() === "unauthenticated") {
+  if (
+    ["unauthenticated", "unauthorized"].includes(error.message.toLowerCase())
+  ) {
     return new Observable((observer) => {
       (async () => {
         const refreshed = await refreshAccessToken();
         if (!refreshed) {
-          window.location.href = "/login";
+          window.location.href = "/auth";
           return observer.error(error);
         }
         const suscriber = forward(operation).subscribe({
