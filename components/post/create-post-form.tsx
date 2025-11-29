@@ -161,8 +161,8 @@ export function CreatePostForm() {
 
   const maxLength = 500;
   return (
-    <div className="px-8 ">
-      <Card className="w-full p-6 border-none shadow-sm rounded-md bg-primary-darker/20">
+    <div className="">
+      <Card className="w-full p-6 border-none shadow-sm rounded-md bg-primary-darker">
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Text Area */}
           <Controller

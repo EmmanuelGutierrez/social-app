@@ -137,7 +137,8 @@
   /* ===== Base Theme (Dark) =====  */
   --background: oklch(0.13 0.03 228.1);
   --surface: oklch(18% 0.035 250);
-  --text: oklch(95% 0.02 250);
+  --text: oklch(0.984 0.003 247.858);
+  --color-white: oklch(0.984 0.003 247.858);
   --text-secondary: oklch(70% 0.03 250);
   --border: oklch(25% 0.02 250);
 
@@ -146,7 +147,7 @@
   --color-primary-light: oklch(70% 0.19 255);
   --color-primary: oklch(60% 0.18 255);
   --color-primary-dark: oklch(45% 0.17 255);
-  --color-primary-darker: oklch(35% 0.15 255);
+  --color-primary-darker: oklch(18% 0.05 251);
 
   /* / ===== Secondary (violet-blue shades) ===== / */
   --color-secondary-lighter: oklch(80% 0.17 300);
@@ -175,12 +176,12 @@
 
   --radius: 0.625rem;
   /* --background: oklch(1 0 0); */
-  --foreground:oklch(0.984 0.003 247.858)
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: var(--color-primary);
+  --foreground:oklch(0.984 0.003 247.858);
+  --card: var(--color-primary-darker);
+  --card-foreground: var(--text)
+  --popover: var(--color-primary-darker);
+  --popover-foreground: var(--text)
+  --primary: var(--color-primary-darker);
   --primary-foreground: oklch(0.984 0.003 247.858);
   --secondary: var(--color-secondary);
   --secondary-foreground: oklch(0.208 0.042 265.755);

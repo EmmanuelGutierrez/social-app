@@ -1,0 +1,36 @@
+query MyFeed($params: FilterFeedPostInput!) {
+  myFeed(params: $params) {
+    inThisPage
+    hasMore
+    inDb
+
+    nextCursor
+    data {
+      iLiked
+      post {
+        _id
+        reactionsCount
+        authorId {
+          _id
+          username
+          name
+          lastname
+          profileImg {
+            _id
+            secure_url
+            public_id
+          }
+        }
+        body
+        createdAt
+        images {
+          _id
+          public_id
+          secure_url
+        }
+        tags
+        title
+      }
+    }
+  }
+}

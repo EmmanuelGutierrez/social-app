@@ -39,22 +39,6 @@ export type CreateUserInput = {
   username: Scalars['String']['input'];
 };
 
-export type FeedPost = {
-  __typename?: 'FeedPost';
-  createdAt: Scalars['Float']['output'];
-  postId: Post;
-  updatedAt: Scalars['Float']['output'];
-  userId: User;
-};
-
-export type FeedPostDataReturnDto = {
-  __typename?: 'FeedPostDataReturnDto';
-  data: Array<FeedPost>;
-  inThisPage: Scalars['Float']['output'];
-  page: Scalars['Float']['output'];
-  total: Scalars['Float']['output'];
-};
-
 export type File = {
   __typename?: 'File';
   _id: Scalars['ID']['output'];
@@ -72,7 +56,7 @@ export type File = {
 };
 
 export type FilterFeedPostInput = {
-  cursorDate?: InputMaybe<Scalars['Int']['input']>;
+  cursorDate?: InputMaybe<Scalars['Float']['input']>;
   limit?: InputMaybe<Scalars['Float']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -98,12 +82,13 @@ export type LoginInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   createPost: Post;
+  dislikePost: RactPostReturnDto;
   followUser: Scalars['Boolean']['output'];
+  likePost: RactPostReturnDto;
   login: AuthReturnDto;
   logout: Scalars['Boolean']['output'];
   register: AuthReturnDto;
   updatePost: Post;
-  updateReaction: Post;
 };
 
 
@@ -113,8 +98,18 @@ export type MutationCreatePostArgs = {
 };
 
 
+export type MutationDislikePostArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationFollowUserArgs = {
   userToFollowId: Scalars['String']['input'];
+};
+
+
+export type MutationLikePostArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -133,9 +128,20 @@ export type MutationUpdatePostArgs = {
   data: UpdatePostInput;
 };
 
+export type MyFeedPostDataReturnDto = {
+  __typename?: 'MyFeedPostDataReturnDto';
+  data: Array<OnePostReturnDto>;
+  hasMore: Scalars['Boolean']['output'];
+  inDb: Scalars['Float']['output'];
+  inThisPage: Scalars['Float']['output'];
+  nextCursor?: Maybe<Scalars['Float']['output']>;
+};
 
-export type MutationUpdateReactionArgs = {
-  id: Scalars['String']['input'];
+export type OnePostReturnDto = {
+  __typename?: 'OnePostReturnDto';
+  iLiked: Scalars['Boolean']['output'];
+  likeCount: Scalars['Float']['output'];
+  post: Post;
 };
 
 export type Post = {
@@ -144,8 +150,9 @@ export type Post = {
   authorId: User;
   body: Scalars['String']['output'];
   createdAt: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
   images?: Maybe<Array<File>>;
-  reactions: Array<User>;
+  reactionsCount: Scalars['Float']['output'];
   replyTo?: Maybe<Post>;
   tags: Array<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
@@ -165,10 +172,9 @@ export type Query = {
   allFiles: Array<File>;
   allPosts: PostDataReturnDto;
   getComments: Post;
-  getOne: Post;
-  mePosts: PostDataReturnDto;
+  getOne: OnePostReturnDto;
   meQuery: User;
-  myFeed: FeedPostDataReturnDto;
+  myFeed: MyFeedPostDataReturnDto;
   rotateAccessToken: AuthReturnDto;
   test: Scalars['String']['output'];
 };
@@ -189,13 +195,13 @@ export type QueryGetOneArgs = {
 };
 
 
-export type QueryMePostsArgs = {
-  params: FilterInput;
-};
-
-
 export type QueryMyFeedArgs = {
   params: FilterFeedPostInput;
+};
+
+export type RactPostReturnDto = {
+  __typename?: 'RactPostReturnDto';
+  ignored: Scalars['Boolean']['output'];
 };
 
 export type SubDataReturnDto = {
@@ -251,6 +257,20 @@ export type CreatePostMutationMutationVariables = Exact<{
 
 export type CreatePostMutationMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', body: string, _id: string, createdAt: number, tags: Array<string>, title?: string | null, replyTo?: { __typename?: 'Post', _id: string, authorId: { __typename?: 'User', _id: string } } | null, images?: Array<{ __typename?: 'File', _id: string, secure_url: string, original_filename: string }> | null } };
 
+export type DislikePostMutationVariables = Exact<{
+  dislikePostId: Scalars['String']['input'];
+}>;
+
+
+export type DislikePostMutation = { __typename?: 'Mutation', dislikePost: { __typename?: 'RactPostReturnDto', ignored: boolean } };
+
+export type LikePostMutationVariables = Exact<{
+  likePostId: Scalars['String']['input'];
+}>;
+
+
+export type LikePostMutation = { __typename?: 'Mutation', likePost: { __typename?: 'RactPostReturnDto', ignored: boolean } };
+
 export type LoginMutationMutationVariables = Exact<{
   loginInput: LoginInput;
 }>;
@@ -276,6 +296,13 @@ export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQueryQuery = { __typename?: 'Query', meQuery: { __typename?: 'User', _id: string, createdAt: number, updatedAt: number, email: string, lastname: string, name: string, role: Roles, username: string, followers: Array<{ __typename?: 'FollowUserDto', followDate: number, _id: string, user: { __typename?: 'User', _id: string, name: string, lastname: string, username: string, profileImg?: { __typename?: 'File', secure_url: string, url: string, _id: string } | null } }>, following: Array<{ __typename?: 'FollowUserDto', followDate: number, _id: string, user: { __typename?: 'User', _id: string, name: string, lastname: string, username: string, profileImg?: { __typename?: 'File', secure_url: string, url: string, _id: string } | null } }>, profileImg?: { __typename?: 'File', _id: string, secure_url: string, url: string } | null } };
 
+export type MyFeedQueryVariables = Exact<{
+  params: FilterFeedPostInput;
+}>;
+
+
+export type MyFeedQuery = { __typename?: 'Query', myFeed: { __typename?: 'MyFeedPostDataReturnDto', inThisPage: number, hasMore: boolean, inDb: number, nextCursor?: number | null, data: Array<{ __typename?: 'OnePostReturnDto', iLiked: boolean, post: { __typename?: 'Post', _id: string, reactionsCount: number, body: string, createdAt: number, tags: Array<string>, title?: string | null, authorId: { __typename?: 'User', _id: string, username: string, name: string, lastname: string, profileImg?: { __typename?: 'File', _id: string, secure_url: string, public_id: string } | null }, images?: Array<{ __typename?: 'File', _id: string, public_id: string, secure_url: string }> | null } }> } };
+
 export type RotateAccessTokenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -283,8 +310,11 @@ export type RotateAccessTokenQuery = { __typename?: 'Query', rotateAccessToken: 
 
 
 export const CreatePostMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createPostMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePostInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"files"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UploadInputArray"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPost"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}},{"kind":"Argument","name":{"kind":"Name","value":"files"},"value":{"kind":"Variable","name":{"kind":"Name","value":"files"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"replyTo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"authorId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"images"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"secure_url"}},{"kind":"Field","name":{"kind":"Name","value":"original_filename"}}]}}]}}]}}]} as unknown as DocumentNode<CreatePostMutationMutation, CreatePostMutationMutationVariables>;
+export const DislikePostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DislikePost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dislikePostId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dislikePost"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dislikePostId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ignored"}}]}}]}}]} as unknown as DocumentNode<DislikePostMutation, DislikePostMutationVariables>;
+export const LikePostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LikePost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"likePostId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"likePost"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"likePostId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ignored"}}]}}]}}]} as unknown as DocumentNode<LikePostMutation, LikePostMutationVariables>;
 export const LoginMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LoginMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"loginInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"loginInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"loginInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenWs"}}]}}]}}]} as unknown as DocumentNode<LoginMutationMutation, LoginMutationMutationVariables>;
 export const LogoutMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LogoutMutation"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"logout"}}]}}]} as unknown as DocumentNode<LogoutMutationMutation, LogoutMutationMutationVariables>;
 export const RegisterMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"registerMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"register"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateUserInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"file"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UploadInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"register"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"register"},"value":{"kind":"Variable","name":{"kind":"Name","value":"register"}}},{"kind":"Argument","name":{"kind":"Name","value":"file"},"value":{"kind":"Variable","name":{"kind":"Name","value":"file"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenWs"}}]}}]}}]} as unknown as DocumentNode<RegisterMutationMutation, RegisterMutationMutationVariables>;
 export const MeQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MeQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"meQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"followers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"followDate"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"profileImg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"secure_url"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"_id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"following"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"followDate"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"profileImg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"secure_url"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"_id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"profileImg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"secure_url"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<MeQueryQuery, MeQueryQueryVariables>;
+export const MyFeedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyFeed"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"params"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FilterFeedPostInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myFeed"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"params"},"value":{"kind":"Variable","name":{"kind":"Name","value":"params"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inThisPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"inDb"}},{"kind":"Field","name":{"kind":"Name","value":"nextCursor"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"iLiked"}},{"kind":"Field","name":{"kind":"Name","value":"post"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"reactionsCount"}},{"kind":"Field","name":{"kind":"Name","value":"authorId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"profileImg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"secure_url"}},{"kind":"Field","name":{"kind":"Name","value":"public_id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"images"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"public_id"}},{"kind":"Field","name":{"kind":"Name","value":"secure_url"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MyFeedQuery, MyFeedQueryVariables>;
 export const RotateAccessTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RotateAccessToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rotateAccessToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenWs"}}]}}]}}]} as unknown as DocumentNode<RotateAccessTokenQuery, RotateAccessTokenQueryVariables>;

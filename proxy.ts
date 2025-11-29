@@ -14,7 +14,6 @@ export function proxy(request: NextRequest) {
     pathname === "/favicon.ico";
 
   // Si no está logeado y la ruta no es pública → redirige al login
-  console.log("PROXY", token, isPublicPath);
   if (!token && !isPublicPath) {
     const loginUrl = new URL("/auth", request.url);
     return NextResponse.redirect(loginUrl);
