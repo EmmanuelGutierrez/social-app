@@ -7,43 +7,42 @@ import {
   MeQueryDocument,
   RegisterMutationDocument,
 } from "@/graphql/types/graphql";
-import { AuthStore, createAuthStore } from "@/zustand/useAuthStore";
+import {  createAuthStore } from "@/zustand/useAuthStore";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
-import { useStore } from "./useStore";
+import { useApp } from "./useApp";
 
-export const useAuthStore = <T>(selector: (store: AuthStore) => T): T => {
-  const result = useStore(createAuthStore, selector);
-  // if (result === undefined) {
-  //   throw new Error(
-  //     "useAuthStore returned undefined. Make sure the provider is set up correctly."
-  //   );
-  // }
-  return result as T;
-};
+// export const useAuthStore = <T>(selector: (store: AuthStore) => T): T => {
+//   const result = useStore(createAuthStore, selector);
+//   return result as T;
+// };
 
 export const useAuth = () => {
-  const authStore = useAuthStore((state) => state);
+  const { hasHydrated, user, setTokenWs, logout, setUser } =
+    createAuthStore();
+  const {setIsLoading}=useApp()
   const [registerMutation, registerData] = useMutation(
     RegisterMutationDocument,
     {
       client: apolloClient,
       onCompleted: async (data) => {
-        if (authStore && data?.register.tokenWs) {
-          localStorage.setItem("tokenWs", data.register.tokenWs);
+        if (data?.register.tokenWs) {
+          setTokenWs(data.register.tokenWs);
           const meRes = await meQuery();
           setUser(meRes.data?.meQuery);
         }
       },
     }
   );
+  
   const [meQuery, meData] = useLazyQuery(MeQueryDocument, {
     client: apolloClient,
+    fetchPolicy:"network-only"
   });
   const [loginMutation, loginData] = useMutation(LoginMutationDocument, {
     client: apolloClient,
     onCompleted: async (data) => {
-      if (authStore && data?.login.tokenWs) {
-        localStorage.setItem("tokenWs", data.login.tokenWs);
+      if (data?.login.tokenWs) {
+        setTokenWs(data.login.tokenWs);
         const meRes = await meQuery();
         setUser(meRes.data?.meQuery);
       }
@@ -53,33 +52,38 @@ export const useAuth = () => {
     client: apolloClient,
   });
 
-  if (!authStore) {
-    return {
-      user: null,
-      login: () => {},
-      register: () => {},
-      logoutUser: () => {},
-      getMe: () => {},
-      errorLogin: undefined,
-      errorRegister: undefined,
-      meError: undefined,
-      loadingLogin: false,
-      loadingRegister: false,
-      hasHydrated: false,
-    };
-  }
-  const { user, setUser, logout, hasHydrated } = authStore;
+  // if (!authStore) {
+  //   return {
+  //     user: null,
+  //     login: () => {},
+  //     register: () => {},
+  //     logoutUser: () => {},
+  //     getMe: () => {},
+  //     errorLogin: undefined,
+  //     errorRegister: undefined,
+  //     meError: undefined,
+  //     loadingLogin: false,
+  //     loadingRegister: false,
+  //     hasHydrated: false,
+  //   };
+  // }
+  // const { user, setUser, logout, hasHydrated } = authStore;
 
   const getMe = async () => {
+    setIsLoading(true)
     const { data } = await meQuery();
     setUser(data?.meQuery);
+    setIsLoading(false)
   };
 
   const login = (loginData: LoginInput) => {
+    setIsLoading(true)
     return loginMutation({ variables: { loginInput: loginData } });
+    setIsLoading(false)
   };
 
-  const register =  (input: CreateUserInput, file?: File) => {
+  const register = (input: CreateUserInput, file?: File) => {
+    setIsLoading(true)
     return registerMutation({
       variables: {
         register: input,
@@ -88,11 +92,14 @@ export const useAuth = () => {
         },
       },
     });
+    setIsLoading(false)
   };
 
   const logoutUser = async () => {
+    setIsLoading(true)
     await logoutMutation();
     logout();
+    setIsLoading(false)
   };
 
   return {

@@ -1,0 +1,7 @@
+fragment PostDataFragment on OnePostReturnDto {
+    iLiked
+    replyCount
+    post {
+      ...PostFragment
+    }
+}

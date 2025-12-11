@@ -1,12 +1,10 @@
 query MyFeed($params: FilterFeedPostInput!) {
   myFeed(params: $params) {
-    inThisPage
     hasMore
-    inDb
-
     nextCursor
     data {
       iLiked
+      replyCount
       post {
         _id
         reactionsCount

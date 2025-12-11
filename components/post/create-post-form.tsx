@@ -20,6 +20,10 @@ import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import UploadMultipleImages from "../common/upload-multiple-images";
 import CircularProgress from "./circular-progress";
+import { usePost } from "@/hooks/usePost";
+import { apolloClient } from "@/graphql/client";
+import { CreatePostMutationDocument } from "@/graphql/types/graphql";
+import { useMutation } from "@apollo/client/react";
 const EMOJI_LIST = [
   "😀",
   "😃",
@@ -73,8 +77,9 @@ const EMOJI_LIST = [
 
 const formSchema = z.object({
   body: z.string().max(500, { error: "El maximo de caracteres es de 500" }),
-  files: z.array(z.instanceof(File)).nullable().optional(),
-  // .file({ error: "Error al subir el archivo" })
+  files: z.any().optional()
+  // files: z.array(z.instanceof(File)).nullable().optional(),
+  // files: z.file({ error: "Error al subir el archivo" })
   // .refine((files) => {
   //   console.log("FILES", files);
   //   return !files || files.size <= 2 * 1024 * 1024;
@@ -90,22 +95,31 @@ const formSchema = z.object({
 export function CreatePostForm() {
   const [images, setImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const { createPost } = usePost()
   // const [loading, setLoading] = useState(false);
   const { handleSubmit, control, formState, setValue, getValues, reset } =
     useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
-      defaultValues: { body: "", files: undefined },
+      defaultValues: { body: "", },
       mode: "onChange",
     });
+
+    console.log(formState.errors)
   // const [createPost, { loading }] = useMutation(CreatePostMutationDocument, {
   //   client: apolloClient,
   // });
+
   async function onSubmit({ files, ...dataForm }: z.infer<typeof formSchema>) {
     try {
       // setLoading(true);\
-      console.log("dataf", dataForm);
-      // await createPost({ variables: { data: dataForm, files: { files } } });
+      console.log("FILES", files);
+      await createPost(dataForm, files);
+      // await createPost({
+      //   variables: {
+      //     data: dataForm,
+      //     files:{files},
+      //   },
+      // });
       reset();
     } catch (e) {
       console.log("e", e);
@@ -160,6 +174,7 @@ export function CreatePostForm() {
   };
 
   const maxLength = 500;
+  console.log("FORM STATE", formState.errors);
   return (
     <div className="">
       <Card className="w-full p-6 border-none shadow-sm rounded-md bg-primary-darker">
@@ -221,15 +236,15 @@ export function CreatePostForm() {
                       ref={field.ref}
                       multiple={false}
                       onBlur={field.onBlur}
-                      // onChange={(e) => {
-                      //   console.log("file eve", e.target);
-                      //   // const files = e.target.files;
-                      //   // if (files) {
-                      //   //   // console.log('files',files[0].arrayBuffer)
-                      //   //   // field.onChange(files[0]);
-                      //   //   // setPreview(URL.createObjectURL(files[0]));
-                      //   // }
-                      // }}
+                    // onChange={(e) => {
+                    //   console.log("file eve", e.target);
+                    //   // const files = e.target.files;
+                    //   // if (files) {
+                    //   //   // console.log('files',files[0].arrayBuffer)
+                    //   //   // field.onChange(files[0]);
+                    //   //   // setPreview(URL.createObjectURL(files[0]));
+                    //   // }
+                    // }}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

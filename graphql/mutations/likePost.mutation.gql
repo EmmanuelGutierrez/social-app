@@ -1,5 +1,6 @@
 mutation LikePost($likePostId: String!) {
   likePost(id: $likePostId) {
     ignored
+    likedCount
   }
 }

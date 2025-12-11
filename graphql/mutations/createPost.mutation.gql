@@ -1,4 +1,4 @@
-mutation createPostMutation($data: CreatePostInput!, $files: UploadInputArray!) {
+mutation createPostMutation($data: CreatePostInput!, $files: [Upload!]!) {
   createPost(data: $data, files: $files) {
     body
     _id

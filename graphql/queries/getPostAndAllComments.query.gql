@@ -1,0 +1,100 @@
+query GetPostAndAllComments($postId: String!) {
+  postAndAllComments(postId: $postId) {
+    replies {
+      hasMore
+      nextCursor
+      data {
+        iLiked
+        likeCount
+        replyCount
+        post {
+          _id
+          reactionsCount
+          authorId {
+            _id
+            username
+            name
+            lastname
+            profileImg {
+              _id
+              secure_url
+              public_id
+            }
+          }
+          body
+          createdAt
+          images {
+            _id
+            public_id
+            secure_url
+          }
+          tags
+          title
+        }
+      }
+    }
+    post {
+      iLiked
+      likeCount
+      replyCount
+      post {
+        _id
+        reactionsCount
+        authorId {
+          _id
+          username
+          name
+          lastname
+          profileImg {
+            _id
+            secure_url
+            public_id
+          }
+        }
+        body
+        createdAt
+        images {
+          _id
+          public_id
+          secure_url
+        }
+        tags
+        title
+      }
+    }
+
+    ancestors {
+      hasMore
+      nextCursor
+      data {
+        iLiked
+        likeCount
+        replyCount
+        post {
+          _id
+          reactionsCount
+          authorId {
+            _id
+            username
+            name
+            lastname
+            profileImg {
+              _id
+              secure_url
+              public_id
+            }
+          }
+          body
+          createdAt
+          images {
+            _id
+            public_id
+            secure_url
+          }
+          tags
+          title
+        }
+      }
+    }
+  }
+}

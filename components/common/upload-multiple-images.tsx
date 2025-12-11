@@ -9,7 +9,7 @@ interface UploadMultipleImagesI {
   field: ControllerRenderProps<
     {
       body: string;
-      files?: File[] | null | undefined;
+      files?: FileList | undefined;
     },
     "files"
   >;
@@ -21,6 +21,7 @@ export default function UploadMultipleImages({ field }: UploadMultipleImagesI) {
 
   const handleImageChange = (files: FileList | null) => {
     const newPreviews: string[] = [];
+    // const newFiles: File[] = []
     if (!files || files.length === 0) return;
 
     for (let i = 0; i < files.length; i++) {
@@ -41,6 +42,7 @@ export default function UploadMultipleImages({ field }: UploadMultipleImagesI) {
         console.log("FILE CH", file);
       }
       newPreviews.push(URL.createObjectURL(file));
+      // newFiles.push(new File([file], file.name, { type: file.type }))
     }
     field.onChange(files);
     setPreviews(newPreviews);
@@ -71,11 +73,10 @@ export default function UploadMultipleImages({ field }: UploadMultipleImagesI) {
         <div className=" group">
           <div
             className={`select-none relative grid gap-1 border-2 border-dashed border-border rounded-xl p-1 bg-muted/10
-          ${
-            previews.length === 0
-              ? "place-items-center w-20 h-20"
-              : "grid-cols-2 grid-rows-2 w-20 h-20"
-          }`}
+          ${previews.length === 0
+                ? "place-items-center w-20 h-20"
+                : "grid-cols-2 grid-rows-2 w-20 h-20"
+              }`}
             onClick={handleEditClick}
           >
             {previews.length === 0 ? (

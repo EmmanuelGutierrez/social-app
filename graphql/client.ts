@@ -13,7 +13,7 @@ import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
 //   uri: "http://localhost:3001/graphql",
 //   credentials: "include",
 // });
-const upliadLink = new UploadHttpLink({
+const uploadLink = new UploadHttpLink({
   uri: "http://localhost:3001/graphql",
   credentials: "include",
   headers: {
@@ -22,7 +22,7 @@ const upliadLink = new UploadHttpLink({
 });
 
 export const apolloClientPlain = new ApolloClient({
-  link: upliadLink,
+  link: uploadLink,
   cache: new InMemoryCache(),
 });
 
@@ -58,6 +58,12 @@ const errorLink = new ErrorLink(({ forward, error, operation }) => {
     isAuthError = ["unauthenticated", "unauthorized"].includes(
       error.message.toLowerCase()
     );
+    console.log(
+      "IS AUTH ERROR",
+      isAuthError,
+      ["unauthenticated", "unauthorized"].includes(error.message.toLowerCase()),
+      error.message.toLowerCase()
+    );
   }
 
   if (!error) {
@@ -67,6 +73,7 @@ const errorLink = new ErrorLink(({ forward, error, operation }) => {
     return new Observable((observer) => {
       (async () => {
         const refreshed = await refreshAccessToken();
+        console.log("REFRESHED", refreshed);
         if (!refreshed) {
           window.location.href = "/auth";
           return observer.error(error);
@@ -149,7 +156,7 @@ const link = ApolloLink.from([
   new HttpLink({ uri: "http://localhost:4000/graphql" }),
 ]);
 */
-const links = ApolloLink.from([errorLink, upliadLink]);
+const links = ApolloLink.from([uploadLink, errorLink]);
 
 export const apolloClient = new ApolloClient({
   link: links,
@@ -160,14 +167,20 @@ export const apolloClient = new ApolloClient({
           myFeed: {
             keyArgs: false,
             merge(
-              existing: MyFeedQuery["myFeed"] = {
+              existing: {
+                data: { post: { __ref: string } }[];
+                nextCursor?: string | null;
+                hasMore: boolean;
+              } = {
                 data: [],
                 nextCursor: null,
                 hasMore: false,
-                inDb: 0,
-                inThisPage: 0,
               },
-              incoming: MyFeedQuery["myFeed"]
+              incoming: {
+                data: { post: { __ref: string } }[];
+                nextCursor?: string | null;
+                hasMore: boolean;
+              }
             ) {
               console.log(
                 "MERGE",
@@ -178,12 +191,27 @@ export const apolloClient = new ApolloClient({
               // if (!existing) {
               //   return incoming;
               // }
-              const newData = {
+              const existingIds = existing.data.map((post) => post.post.__ref);
+              console.log("Existing", existing, existingIds);
+              const data = [
+                ...existing.data,
+                ...incoming.data.filter(
+                  (p) => !existingIds.includes(p.post.__ref)
+                ),
+              ];
+              console.log("Data", data);
+
+              const newFeedData = {
                 ...incoming,
-                data: [...existing.data, ...incoming.data],
+                data,
               };
-              console.log("NEW DATA", existing.data, incoming.data, newData);
-              return newData;
+              console.log(
+                "NEW DATA",
+                existing.data,
+                incoming.data,
+                newFeedData
+              );
+              return newFeedData;
             },
           },
         },

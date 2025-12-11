@@ -1,27 +1,18 @@
 import { apolloClient } from "@/graphql/client";
 import {
-  MyFeedDocument,
   LikePostDocument,
   DislikePostDocument,
+  GetPostAndAllCommentsDocument,
+  CreatePostMutationDocument,
+  CreatePostInput,
 } from "@/graphql/types/graphql";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
+// import { useApp } from "./useApp";
 
 export const usePost = () => {
+  // const { setIsLoading } = useApp();
   const [likePostMutation, likePostData] = useMutation(LikePostDocument, {
     client: apolloClient,
-
-    // update(cache, { data, }) {
-    //   if (!data?.likePost) {
-    //     return;
-    //   }
-    //   data.
-    //   cache.modify({
-    //     id: cache.identify({ __typename: "Post", _id: "" }),
-    //     fields:{
-
-    //     }
-    //   });
-    // },
   });
   const [dislikePostMutation, dislikePostData] = useMutation(
     DislikePostDocument,
@@ -29,53 +20,36 @@ export const usePost = () => {
       client: apolloClient,
     }
   );
-  // const [myFeed, setMyFeed] = useState<MyFeedQuery>();
-  // useEffect(() => {
-  //   console.log("MY FEED", myFeed);
-  // }, [myFeed]);
-  // const getMyFeed = async (params: FilterFeedPostInput) => {
-  //   const res = await myFeedQuery({
-  //     variables: {
-  //       params,
-  //     },
-  //   });
-  //   // if (res.data) {
-  //   //   setMyFeed(res.data);
-  //   // }
-  // };
-
-  function useMyFeed() {
-    const {
-      data: myFeed,
-      loading,
-      error,
-      fetchMore,
-    } = useQuery(MyFeedDocument, {
+  const [createPostMutation, { loading: createPostLoading }] = useMutation(
+    CreatePostMutationDocument,
+    {
       client: apolloClient,
-      variables: {
-        params: {
-          limit: 5,
-          cursorDate: null,
-        },
-      },
-      fetchPolicy: "network-only",
-    });
-    const loadMore = () => {
-      if (!myFeed?.myFeed.hasMore) {
-        return;
-      }
+    }
+  );
+  const [
+    postAndCommentsFetch,
+    { data: postAndAllCommentsData, loading: postAndAllCommentsLoading },
+  ] = useLazyQuery(GetPostAndAllCommentsDocument, {
+    client: apolloClient,
+  });
 
-      return fetchMore({
-        variables: {
-          params: {
-            limit: 5,
-            cursorDate: myFeed.myFeed.nextCursor,
-            // tags,
-          },
-        },
-      });
-    };
-    return { myFeed, loading, error, loadMore };
+  async function createPost(data: CreatePostInput, files?: FileList) {
+    const res = await createPostMutation({
+      variables: {
+        data,
+        files,
+      },
+    });
+    return res;
+  }
+
+  async function getPostAndAllComments(postId: string) {
+    const res = await postAndCommentsFetch({
+      variables: {
+        postId,
+      },
+    });
+    return res;
   }
 
   async function likePost(likePostId: string) {
@@ -83,43 +57,7 @@ export const usePost = () => {
       variables: {
         likePostId,
       },
-      // update(cache, { data }) {
-      //   console.log("UPDATE")
-      //   if (!data?.likePost) {
-      //     return;
-      //   }
-      //   const res= cache.readQuery({
-      //     query: MyFeedDocument,
-      //     variables: {
-      //       params: {
-      //         limit: 10,
-      //       },
-      //     },
-      //   });
-      //   console.log('res',res)
-      // },
     });
-    // console.log("LIKE POST", res.data?.likePost, myFeed);
-    // if (res.data?.likePost && myFeed) {
-    //   const myNewFeedData = myFeed?.myFeed.data.map((postD) => {
-    //     if (postD.post._id === likePostId) {
-    //       return {
-    //         __typename: postD.__typename,
-    //         iLiked: true,
-    //         post: {
-    //           ...postD.post,
-    //           reactionsCount: postD.post.reactionsCount + 1,
-    //         },
-    //       };
-    //     }
-    //     return postD;
-    //   });
-
-    //   setMyFeed({
-    //     ...myFeed,
-    //     myFeed: { ...myFeed.myFeed, data: myNewFeedData },
-    //   });
-    // }
   }
 
   async function dislikePost(dislikePostId: string) {
@@ -127,50 +65,22 @@ export const usePost = () => {
       variables: {
         dislikePostId,
       },
-      // update(cache, { data }) {
-      //   if (!data?.dislikePost) {
-      //     return;
-      //   }
-      //   cache.modify({
-      //     id: cache.identify({ __typename: "Post", _id: dislikePostId }),
-      //     fields: {
-      //       reactionsCount: (prev: number) => prev - 1,
-      //     },
-      //   });
-      // },
     });
-    // console.log("disLIKE POST", res.data?.dislikePost, myFeed);
-    // if (res.data?.dislikePost && myFeed) {
-    //   const myNewFeedData = myFeed?.myFeed.data.map((postD) => {
-    //     if (postD.post._id === dislikePostId) {
-    //       return {
-    //         __typename: postD.__typename,
-    //         iLiked: false,
-    //         post: {
-    //           ...postD.post,
-    //           reactionsCount: postD.post.reactionsCount - 1,
-    //         },
-    //       };
-    //     }
-    //     return postD;
-    //   });
-    //   setMyFeed({
-    //     ...myFeed,
-    //     myFeed: { ...myFeed.myFeed, data: myNewFeedData },
-    //   });
-    // }
   }
 
   return {
-    // getMyFeed,
-    useMyFeed,
-    // myFeedError: myFeedData.error,
-    // myFeedLoading: myFeedData.loading,
     likePost,
     dislikePost,
+    createPost,
+    createPostLoading,
+    getPostAndAllComments,
+    postAndAllComments: postAndAllCommentsData?.postAndAllComments,
+    postAndAllCommentsLoading,
     likePostError: likePostData.error,
     likePostLoading: likePostData.loading,
     dislikePostError: dislikePostData.error,
     dislikePostLoading: dislikePostData.loading,
+    // likesCountLoading,
+    // likesCountData,
   };
 };

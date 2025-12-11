@@ -6,15 +6,18 @@ const config: CodegenConfig = {
   documents: [
     "./graphql/queries/*.{ts,tsx,graphql,gql}",
     "./graphql/mutations/*.{ts,tsx,graphql,gql}",
+    "./graphql/fragments/*.{ts,tsx,graphql,gql}",
   ],
   generates: {
-    "./graphql/types/types.generated.ts": {
-      plugins: ["typescript", "typescript-operations"],
-    },
+    // "./graphql/types/types.generated.ts": {
+    //   plugins: ["typescript", "typescript-operations"],
+    // },
     "./graphql/types/": {
       preset: "client",
       presetConfig: {
         gqlTagName: "gql",
+        preResolveTypes: true,
+        mergeFragmentTypes: true,
       },
     },
   },
