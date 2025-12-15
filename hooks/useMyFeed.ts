@@ -17,6 +17,7 @@ export function useMyFeed() {
         },
       },
       fetchPolicy: "network-only",
+      nextFetchPolicy:"cache-first"
     });
     const loadMore = () => {
       if (!myFeed?.myFeed.hasMore) {

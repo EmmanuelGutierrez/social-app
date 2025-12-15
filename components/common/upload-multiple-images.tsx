@@ -4,24 +4,16 @@ import { X, Plus } from "lucide-react";
 import Image from "next/image";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ControllerRenderProps } from "react-hook-form";
-interface UploadMultipleImagesI {
-  field: ControllerRenderProps<
-    {
-      body: string;
-      files?: FileList | undefined;
-    },
-    "files"
-  >;
-}
+import imageComp from "browser-image-compression";
+import { UploadMultipleImagesI } from "@/common/interfaces/uploadMultipleImages.interface";
 
 export default function UploadMultipleImages({ field }: UploadMultipleImagesI) {
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (files: FileList | null) => {
+  const handleImageChange = async (files: FileList | null) => {
     const newPreviews: string[] = [];
-    // const newFiles: File[] = []
+    const compressedFiles: File[] = []
     if (!files || files.length === 0) return;
 
     for (let i = 0; i < files.length; i++) {
@@ -33,18 +25,19 @@ export default function UploadMultipleImages({ field }: UploadMultipleImagesI) {
         return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
-        alert("La imagen no debe superar 5MB");
-        return;
+      if (file.size > 2 * 1024 * 1024) {
+        const compressedFile = await imageComp(file, {
+          maxSizeMB: 2,
+          maxWidthOrHeight: 1200,
+        });
+        compressedFiles.push(compressedFile)
+      } else {
+        compressedFiles.push(file)
       }
 
-      if (file) {
-        console.log("FILE CH", file);
-      }
       newPreviews.push(URL.createObjectURL(file));
-      // newFiles.push(new File([file], file.name, { type: file.type }))
     }
-    field.onChange(files);
+    field.onChange(compressedFiles);
     setPreviews(newPreviews);
 
     // const reader = new FileReader();

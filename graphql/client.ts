@@ -28,18 +28,23 @@ export const apolloClientPlain = new ApolloClient({
 
 async function refreshAccessToken() {
   try {
-    const { data } = await apolloClientPlain.query({
-      query: RotateAccessTokenDocument,
+    const { data, error } = await apolloClientPlain.mutate({
+      mutation: RotateAccessTokenDocument,
+      fetchPolicy: "no-cache",
     });
+    console.log("DATA AND ERROR", data, error);
     if (data?.rotateAccessToken) {
       localStorage.setItem("tokenWs", data?.rotateAccessToken.tokenWs);
+      console.log("Return ok");
       return true;
     }
+    console.log("Return false");
     await apolloClientPlain.mutate({
       mutation: LogoutMutationDocument,
     });
     return false;
   } catch (error) {
+    console.log("ERROR");
     sessionStorage.clear();
     await apolloClientPlain.mutate({
       mutation: LogoutMutationDocument,
@@ -156,7 +161,7 @@ const link = ApolloLink.from([
   new HttpLink({ uri: "http://localhost:4000/graphql" }),
 ]);
 */
-const links = ApolloLink.from([uploadLink, errorLink]);
+const links = ApolloLink.from([errorLink, uploadLink]);
 
 export const apolloClient = new ApolloClient({
   link: links,
@@ -168,7 +173,7 @@ export const apolloClient = new ApolloClient({
             keyArgs: false,
             merge(
               existing: {
-                data: { post: { __ref: string } }[];
+                data: { post: { __ref?: string; _id?: string } }[];
                 nextCursor?: string | null;
                 hasMore: boolean;
               } = {
@@ -177,26 +182,25 @@ export const apolloClient = new ApolloClient({
                 hasMore: false,
               },
               incoming: {
-                data: { post: { __ref: string } }[];
+                data: { post: { __ref?: string; _id?: string } }[];
                 nextCursor?: string | null;
                 hasMore: boolean;
               }
             ) {
               console.log(
                 "MERGE",
-                incoming.hasMore,
-                existing.nextCursor,
-                incoming.nextCursor
+                incoming,
+                existing,
               );
               // if (!existing) {
               //   return incoming;
               // }
-              const existingIds = existing.data.map((post) => post.post.__ref);
+              const existingIds = existing.data.map((post) => post.post.__ref || `Post:${post.post._id}`);
               console.log("Existing", existing, existingIds);
               const data = [
                 ...existing.data,
                 ...incoming.data.filter(
-                  (p) => !existingIds.includes(p.post.__ref)
+                  (p) => !existingIds.includes(p.post.__ref || `Post:${p.post._id}`)
                 ),
               ];
               console.log("Data", data);

@@ -10,6 +10,12 @@ query GetPostAndAllComments($postId: String!) {
         post {
           _id
           reactionsCount
+          replyTo {
+            _id
+            authorId {
+              _id
+            }
+          }
           authorId {
             _id
             username

@@ -1,4 +1,4 @@
-query RotateAccessToken {
+mutation RotateAccessToken {
   rotateAccessToken {
     tokenWs
   }

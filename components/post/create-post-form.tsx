@@ -2,82 +2,35 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Smile, Send } from "lucide-react";
+import { Smile, Send, X, ImageIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { toast } from "sonner";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
-import UploadMultipleImages from "../common/upload-multiple-images";
+import { Field, FieldLabel } from "../ui/field";
 import CircularProgress from "./circular-progress";
 import { usePost } from "@/hooks/usePost";
-import { apolloClient } from "@/graphql/client";
-import { CreatePostMutationDocument } from "@/graphql/types/graphql";
-import { useMutation } from "@apollo/client/react";
-const EMOJI_LIST = [
-  "😀",
-  "😃",
-  "😄",
-  "😁",
-  "😆",
-  "😅",
-  "🤣",
-  "😂",
-  "❤️",
-  "🧡",
-  "💛",
-  "💚",
-  "💙",
-  "💜",
-  "🖤",
-  "🤍",
-  "👍",
-  "👎",
-  "👌",
-  "✌️",
-  "🤟",
-  "🙌",
-  "👏",
-  "🎉",
-  "🚀",
-  "✨",
-  "🔥",
-  "💯",
-  "⭐",
-  "🌟",
-  "💎",
-  "🎁",
-  "🍕",
-  "🍔",
-  "🍟",
-  "🌮",
-  "🍜",
-  "☕",
-  "🍺",
-  "🍷",
-  "😍",
-  "🥰",
-  "😘",
-  "😗",
-  "😚",
-  "😙",
-  "🥲",
-  "😋",
-];
+import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
+import imageComp from "browser-image-compression";
+import { toastCustom } from "@/lib/toastCustom";
+import { EMOJIS } from "@/common/constants/emojis";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useAuth } from "@/hooks/useAuth";
+
 
 const formSchema = z.object({
   body: z.string().max(500, { error: "El maximo de caracteres es de 500" }),
-  files: z.any().optional()
+  files: z.any().optional(),
+  replyTo: z.string().optional(),
   // files: z.array(z.instanceof(File)).nullable().optional(),
   // files: z.file({ error: "Error al subir el archivo" })
   // .refine((files) => {
@@ -92,80 +45,33 @@ const formSchema = z.object({
   // ),
 });
 
-export function CreatePostForm() {
-  const [images, setImages] = useState<string[]>([]);
+export function CreatePostForm({ replyTo }: { replyTo?: string }) {
+  // const [images, setImages] = useState<string[]>([]);
+  // const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { createPost } = usePost()
+  const { user } = useAuth()
   // const [loading, setLoading] = useState(false);
-  const { handleSubmit, control, formState, setValue, getValues, reset } =
+  const { handleSubmit, control, formState, setValue, getValues, reset, watch } =
     useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
-      defaultValues: { body: "", },
+      defaultValues: { body: "", replyTo },
       mode: "onChange",
     });
 
-    console.log(formState.errors)
-  // const [createPost, { loading }] = useMutation(CreatePostMutationDocument, {
-  //   client: apolloClient,
-  // });
 
   async function onSubmit({ files, ...dataForm }: z.infer<typeof formSchema>) {
     try {
-      // setLoading(true);\
-      console.log("FILES", files);
       await createPost(dataForm, files);
-      // await createPost({
-      //   variables: {
-      //     data: dataForm,
-      //     files:{files},
-      //   },
-      // });
       reset();
     } catch (e) {
       console.log("e", e);
-      toast.error("You submitted the following values:", {
-        description: (
-          <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-            <code>Datos incorrectos</code>
-          </pre>
-        ),
-        position: "bottom-right",
-        classNames: {
-          content: "flex flex-col gap-2",
-        },
-        style: {
-          "--border-radius": "calc(var(--radius)  + 4px)",
-        } as React.CSSProperties,
-      });
+      toastCustom.error("Error", "Error al crear el post")
     } finally {
       // setLoading(false);
     }
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    Array.from(files).forEach((file) => {
-      if (images.length >= 4) {
-        alert("Máximo 4 imágenes permitidas");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages((prev) => {
-          if (prev.length < 4) {
-            return [...prev, reader.result as string];
-          }
-          return prev;
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-
-    e.target.value = "";
-  };
 
   const addEmoji = (emoji: string) => {
     // setContent((prev) => prev + emoji);
@@ -173,36 +79,205 @@ export function CreatePostForm() {
     setValue("body", currentBody + emoji);
   };
 
+  const handleCompressFiles = async (files: FileList | null, prevFiles: File[] | null) => {
+    if (!files) return
+
+    const compressedFiles: File[] = [...(prevFiles || [])]
+
+    if (!files || files.length === 0 || (files.length + (prevFiles?.length || 0)) > 4) {
+      toastCustom.error("Error", "Se han superado las 4 imágenes")
+
+      return compressedFiles
+    };
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const validTypes = ["image/jpeg", "image/png", "image/webp"];
+
+      if (!validTypes.includes(file.type)) {
+        toastCustom.error("Error", "Formato incorrecto")
+
+        return compressedFiles;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        const compressedFile = await imageComp(file, {
+          maxSizeMB: 2,
+          maxWidthOrHeight: 1200,
+        });
+        compressedFiles.push(compressedFile)
+      } else {
+        compressedFiles.push(file)
+      }
+
+    }
+    return compressedFiles
+
+  }
+
+  // const clearImages = () => {
+  //   setValue("files", [])
+  //   setPreviews([])
+  // }
+
   const maxLength = 500;
-  console.log("FORM STATE", formState.errors);
+  const progress = (watch("body").length / maxLength) * 100;
   return (
     <div className="">
-      <Card className="w-full p-6 border-none shadow-sm rounded-md bg-primary-darker">
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          {/* Text Area */}
-          <Controller
-            name="body"
-            control={control}
-            render={({ field, fieldState }) => {
-              const progress = (field.value.length / maxLength) * 100;
-              return (
-                <Field
-                  className="space-y-2 relative"
-                  data-invalid={fieldState.invalid}
-                >
-                  <Textarea
-                    {...field}
-                    id="body"
-                    placeholder="¿Qué estas pensando?"
-                    className="min-h-24 resize-none text-base bg-input border-border focus-visible:ring-0"
-                  />
+      <Card className=" w-full p-4 shadow-sm rounded-md bg-primary-darker border border-primary/20 ">
+        <div className="flex w-full box-border gap-2">
+          <div className="">
+            <Avatar className="h-10 w-10">
+              <AvatarImage className="object-cover"
+                src={user?.profileImg?.secure_url || "/placeholder.svg"}
+                alt={user?.name}
+                width={48}
+                height={48}
+              />
+              <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+          </div>
+          <div className="w-full min-w-0">
+            <form className="" onSubmit={handleSubmit(onSubmit)}>
+              <div className="space-y-4">
 
+                {/* Text Area */}
+                <Controller
+                  name="files"
+                  control={control}
+                  // rules={{
+                  //   validate: (value) => value.length <= 4 || "Maximum 4 images allowed",
+                  // }}
+                  render={({ field }) => (
+                    <>
+                      <AnimatePresence>
+                        {field.value?.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className={`grid gap-1 mt-3 rounded-xl overflow-hidden ${field.value.length === 1 ? "grid-cols-1" : "grid-cols-2"
+                              }`}
+                          >
+                            {field.value.map((file: File, i: number) => (
+                              i < 4 ? <motion.div
+                                key={i}
+                                className="relative aspect-video bg-muted rounded-lg overflow-hidden"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                              >
+                                <Image src={URL.createObjectURL(file) || "/placeholder.svg"} fill alt="" className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newImages = field.value.filter((_: File, idx: number) => idx !== i)
+                                    field.onChange(newImages)
+                                  }}
+                                  className="absolute top-2 right-2 bg-background/80 hover:bg-background text-foreground rounded-full p-1.5 transition-colors"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </motion.div> : <></>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple={!watch("files") || watch("files")?.length < 3}
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const compressedFiles = await handleCompressFiles(e.target.files, field.value)
+                          field.onChange(compressedFiles);
+
+                          e.target.value = ""
+                        }}
+                        className="hidden"
+                      />
+                    </>
+                  )}
+                />
+                <Controller
+                  name="body"
+                  control={control}
+                  render={({ field, fieldState }) => {
+
+                    return (
+                      <Field
+                        className="space-y-2 relative"
+                        data-invalid={fieldState.invalid}
+                      >
+                        <Textarea
+                          {...field}
+                          id="body"
+                          placeholder="¿Qué estas pensando?"
+
+                          className="resize-none text-base bg-transparent border-0 
+                    border-b border-transparent focus-visible:border-primary 
+                    rounded-none focus-visible:ring-0 ring-offset-0
+                    min-h-4 w-full box-border whitespace-pre-wrap leading-relaxed
+                    wrap-break-word 
+                    "
+                        />
+
+
+                      </Field>
+                    );
+                  }}
+                />
+                <div className="flex items-center justify-between bg-transparent mb-0">
+                  <div className="flex items-center gap-2">
+
+                    <div className="my-auto">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground hover:text-accent hover:bg-accent/10"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <ImageIcon className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    {/* Emoji Picker */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground hover:text-accent hover:bg-accent/10"
+                        >
+                          <Smile className="w-5 h-5" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-0">
+                        <div className="grid grid-cols-8 gap-1 p-3">
+                          {EMOJIS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              onClick={() => addEmoji(emoji)}
+                              className="p-2 text-xl hover:bg-accent/10 rounded transition-colors cursor-pointer"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+
+
+                  </div>
+
+                  {/* Post Button */}
                   <div className="flex gap-x-4 items-center">
                     <FieldLabel
                       htmlFor="form-rhf-demo-title"
                       className="text-white"
                     >
-                      {field.value.length}/500
+                      {watch("body").length}/500
                     </FieldLabel>
                     <CircularProgress
                       size={30}
@@ -210,105 +285,19 @@ export function CreatePostForm() {
                       progress={progress}
                     />
                   </div>
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
-                </Field>
-              );
-            }}
-          />
-          <div className="flex items-center justify-between pt-3 border-t border-primary-light bg-transparent mb-0">
-            <div className="flex items-center gap-2">
-              <Controller
-                name="files"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field
-                    className="space-y-2"
-                    data-invalid={fieldState.invalid}
-                  >
-                    <UploadMultipleImages field={field} />
-                    <Input
-                      id="file"
-                      type="file"
-                      className="hidden"
-                      name={field.name}
-                      ref={field.ref}
-                      multiple={false}
-                      onBlur={field.onBlur}
-                    // onChange={(e) => {
-                    //   console.log("file eve", e.target);
-                    //   // const files = e.target.files;
-                    //   // if (files) {
-                    //   //   // console.log('files',files[0].arrayBuffer)
-                    //   //   // field.onChange(files[0]);
-                    //   //   // setPreview(URL.createObjectURL(files[0]));
-                    //   // }
-                    // }}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              {/* Emoji Picker */}
-              <Popover>
-                <PopoverTrigger asChild>
                   <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-accent hover:bg-accent/10"
+                    type="submit"
+                    disabled={!formState.isValid}
+                    className="h-12  rounded-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   >
-                    <Smile className="w-5 h-5" />
+                    <Send className="size-5" />
+                    Postear
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 p-0">
-                  <div className="grid grid-cols-8 gap-1 p-3">
-                    {EMOJI_LIST.map((emoji) => (
-                      <button
-                        key={emoji}
-                        onClick={() => addEmoji(emoji)}
-                        className="p-2 text-xl hover:bg-accent/10 rounded transition-colors cursor-pointer"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Image Count */}
-              {images.length > 0 && (
-                <span className="text-xs text-muted-foreground ml-2">
-                  {images.length}/4
-                </span>
-              )}
-            </div>
-
-            {/* Post Button */}
-            <Button
-              type="submit"
-              disabled={!formState.isValid}
-              className="h-12  rounded-full bg-accent hover:bg-accent/90 text-accent-foreground"
-            >
-              <Send className="size-5" />
-              Postear
-            </Button>
+                </div>
+              </div>
+            </form>
           </div>
-
-          {/* Hidden File Input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </form>
+        </div>
       </Card>
     </div>
   );

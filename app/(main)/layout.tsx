@@ -13,7 +13,7 @@ export default function RootLayout({
         <div
           className="w-full col-start-1 col-end-15 md:col-start-2 md:col-end-14 
       lg:col-start-5 lg:col-end-11 xl:col-start-5 xl:col-end-11 h-full border-x border-border/20
-      *:py-6 *:px-4
+      
       "
         >
           {children}

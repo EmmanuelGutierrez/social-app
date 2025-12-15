@@ -25,15 +25,17 @@ import { SlidingCounter } from "../common/SlidingCounter";
 import { MyFeedQuery } from "@/graphql/types/graphql";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useRouter } from "next/navigation";
+import { Separator } from "../ui/separator";
 
 interface PostDisplayProps {
   postData: MyFeedQuery["myFeed"]["data"][number]
+  variant?: "default" | "compact"
 }
 
 export default function PostDisplay({
-  postData: { iLiked, post, replyCount }
+  postData: { iLiked, post, replyCount }, variant = "default"
 }: PostDisplayProps) {
-  const router= useRouter()
+  const router = useRouter()
   const { dislikePost, likePost, likePostLoading, dislikePostLoading } = usePost()
   const [userReaction, setUserReaction] = useState<boolean>(
     iLiked
@@ -71,13 +73,15 @@ export default function PostDisplay({
       }
     }
   };
-  const handlePostClick=()=>{
+  const handlePostClick = () => {
     router.push(`/post/${post._id}`)
   }
 
   return (
-    <Card ref={ref} onClick={handlePostClick} className="w-full hover:bg-primary-darker/50 transform delay-75  hover:shadow-lg transition-all cursor-pointer duration-200 border border-primary/20  rounded-xl py-2 gap-0 flex flex-row">
-      <div className="py-4 pl-4">
+    <Card ref={ref} onClick={handlePostClick} className={`w-full hover:bg-primary-darker/50 transform 
+    delay-75 hover:shadow-lg transition-all cursor-pointer duration-200 border border-primary/20  
+    ${variant === "compact" ? "py-1" : "py-4"} gap-0 flex flex-row mt-8 rounded-sm` } >
+      <div className={`${variant === "compact" ? "py-2" : "py-4"} pl-4`}>
         <Avatar className="h-10 w-10">
           <AvatarImage className="object-cover"
             src={post.authorId.profileImg?.secure_url || "/placeholder.svg"}
@@ -88,9 +92,9 @@ export default function PostDisplay({
           <AvatarFallback>{post.authorId.name.charAt(0)}</AvatarFallback>
         </Avatar>
       </div>
-      <div className="w-full">
+      <div className="min-w-0 w-full">
         {/* Header */}
-        <div className="p-4  flex  items-start justify-between ">
+        <div className={`${variant === "compact" ? "py-2" : "py-4"} p-4 flex  items-start justify-between`}>
           <div className="flex gap-3 flex-1">
 
             <div className="flex-1">
@@ -127,10 +131,10 @@ export default function PostDisplay({
         </div>
 
         {/* Content */}
-        <div className="px-4 py-0 space-y-3">
+        <div className="px-4 py-0 space-y-3 w-full">
           {post.title && <h2 className="text-lg font-bold ">{post.title}</h2>}
-          <p className="pt-2 pb-4 font-light leading-relaxed whitespace-pre-wrap">{post.body}</p>
-
+          <p className={`${variant === "compact" ? "pt-1 pb-2" : "pt-2 pb-4 "} 
+          font-normal leading-relaxed whitespace-pre-wrap wrap-break-word text-sm`}>{post.body}</p>
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 pt-2">
@@ -173,7 +177,7 @@ export default function PostDisplay({
         )}
 
         {/* Actions */}
-        <div className={`px-4 py-3 flex items-center justify-start gap-4 relative hover:none`}>
+        <div className={`px-4 ${variant === "compact" ? "py-2" : "py-4"} flex items-center justify-start gap-4 relative hover:none`}>
           {/* Like Button with Reaction Popup */}
           <div className="relative group">
             <Button
@@ -199,7 +203,7 @@ export default function PostDisplay({
             variant="ghost"
             size="sm"
             className="gap-2 text-sm"
-            onClick={(e) => { e.stopPropagation(); console.log("comment") }}
+            onClick={(e) => { e.stopPropagation(); }}
           >
             <MessageCircle className="size-5" />
             <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -207,26 +211,6 @@ export default function PostDisplay({
             </span>
           </Button>
         </div>
-
-        {/* Comments Section */}
-        {/* {post.comments && post.comments.length > 0 && (
-        <div className="border-t border-border p-4 space-y-4 bg-muted/30">
-          <h4 className="font-semibold text-sm ">
-            Comentarios ({post.comments.length})
-          </h4>
-          <div className="space-y-4">
-            {post.comments.map((comment) => (
-              <div key={comment.id} className="pl-4 border-l-2 border-border">
-                <PostDisplay
-                  post={comment}
-                  onReact={onReact}
-                  onComment={onComment}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )} */}
       </div>
     </Card>
   );

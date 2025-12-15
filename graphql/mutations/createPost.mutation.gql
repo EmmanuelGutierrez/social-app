@@ -1,20 +1,32 @@
 mutation createPostMutation($data: CreatePostInput!, $files: [Upload!]!) {
   createPost(data: $data, files: $files) {
-    body
     _id
-    createdAt
-    tags
-    title
+    reactionsCount
     replyTo {
       _id
       authorId {
         _id
       }
     }
+    authorId {
+      _id
+      username
+      name
+      lastname
+      profileImg {
+        _id
+        secure_url
+        public_id
+      }
+    }
+    body
+    createdAt
     images {
       _id
+      public_id
       secure_url
-      original_filename
     }
+    tags
+    title
   }
 }

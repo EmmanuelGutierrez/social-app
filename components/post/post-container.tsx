@@ -10,10 +10,6 @@ export const PostContainer = () => {
   const loaderRef = useRef<HTMLDivElement>(null)
   const { myFeed, loadMore, loading } = useMyFeed();
 
-  // useEffect(() => {
-  //   console.log(myFeed)
-  // }, [myFeed]);
-
   useEffect(() => {
     const element = loaderRef.current
     if (!element) {

@@ -1,0 +1,41 @@
+query GetComments($postId: String!, $cursor: String) {
+  getComments(postId: $postId, cursor: $cursor) {
+    nextCursor
+    hasMore
+    data {
+      iLiked
+      likeCount
+      replyCount
+      post {
+        _id
+        reactionsCount
+        replyTo {
+          _id
+          authorId {
+            _id
+          }
+        }
+        authorId {
+          _id
+          username
+          name
+          lastname
+          profileImg {
+            _id
+            secure_url
+            public_id
+          }
+        }
+        body
+        createdAt
+        images {
+          _id
+          public_id
+          secure_url
+        }
+        tags
+        title
+      }
+    }
+  }
+}

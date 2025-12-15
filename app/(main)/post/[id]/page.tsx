@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useEffectEvent } from "react"
 import { useParams, useRouter } from "next/navigation"
 import PostDisplay from "@/components/post/post-display"
 // import { PostCreator } from "@/components/post/post-creator"
@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "motion/react"
 import { useApp } from "@/hooks/useApp"
 import { usePost } from "@/hooks/usePost"
 import { CreatePostForm } from "@/components/post/create-post-form"
+import { Separator } from "@/components/ui/separator"
 
 
 export default function VogelPostDetailPage() {
@@ -18,14 +19,16 @@ export default function VogelPostDetailPage() {
     const postId = params.id as string
     const mainPostRef = useRef<HTMLDivElement>(null)
 
-    const [loadingMoreReplies, setLoadingMoreReplies] = useState(false)
-    const [hasMoreReplies, setHasMoreReplies] = useState(true)
-    const [showMoreParents, setShowMoreParents] = useState(false)
 
     // const { isLoading } = useApp()
-    const { getPostAndAllComments, postAndAllComments,postAndAllCommentsLoading } = usePost()
-    useEffect(() => {
+    const { getPostAndAllComments, postAndAllComments, postAndAllCommentsLoading,
+        getComments, commentsLoading } = usePost()
+    const getPostData = useEffectEvent((postId: string) => {
         getPostAndAllComments(postId)
+    })
+
+    useEffect(() => {
+        getPostData(postId)
     }, [postId])
 
     // useEffect(() => {
@@ -40,14 +43,11 @@ export default function VogelPostDetailPage() {
     //     }
     // }, [loading, mainPost])
 
-    // const loadMoreReplies = async () => {
-    //     setLoadingMoreReplies(true)
-    //     await new Promise((resolve) => setTimeout(resolve, 500))
-    //     const newReplies = generateReplies(postId, 4)
-    //     setReplies((prev) => [...prev, ...newReplies])
-    //     if (replies.length >= 12) setHasMoreReplies(false)
-    //     setLoadingMoreReplies(false)
-    // }
+    const loadMoreReplies = async () => {
+        if (postAndAllComments?.replies.nextCursor) {
+            await getComments(postId, postAndAllComments?.replies.nextCursor)
+        }
+    }
 
     // const handleNewReply = (content: string, images: string[]) => {
     //     const newReply: VogelPost = {
@@ -69,7 +69,6 @@ export default function VogelPostDetailPage() {
     //     }
     //     setReplies((prev) => [newReply, ...prev])
     // }
-    console.log("postAndAllComments", postAndAllComments,  postAndAllCommentsLoading)
 
     if (postAndAllCommentsLoading || !postAndAllComments) {
         return (
@@ -161,51 +160,57 @@ export default function VogelPostDetailPage() {
 
                 {/* Reply Creator */}
                 <div className="mb-6">
-                    <CreatePostForm />
+                    <CreatePostForm replyTo={postAndAllComments.post.post._id} />
                 </div>
 
                 {/* Replies Section */}
-                {/* {replies.length > 0 && (
+                {postAndAllComments.replies.data.length > 0 && (
                     <div>
                         <h2 className="text-lg font-semibold text-foreground mb-4">Replies</h2>
 
                         <div className="space-y-4">
                             <AnimatePresence mode="popLayout">
-                                {replies.map((reply, index) => (
+                                {postAndAllComments.replies.data.map((reply, index) => (
                                     <motion.div
-                                        key={reply.id}
+                                        key={reply.post._id}
                                         layout
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.05 }}
                                     >
-                                        <VogelPostCard post={reply} variant="compact" />
+
+                                        <div className="flex">
+                                            {/* <div className="min-h-0">
+                                                <Separator orientation="vertical" className=" ml-8 mr-3" />
+                                            </div> */}
+                                            <PostDisplay postData={reply} variant="compact" />
+                                        </div>
                                     </motion.div>
                                 ))}
                             </AnimatePresence>
                         </div>
 
-                        {hasMoreReplies && (
+                        {postAndAllComments.replies.hasMore && (
                             <div className="mt-6 flex justify-center">
                                 <Button
                                     variant="outline"
                                     onClick={loadMoreReplies}
-                                    disabled={loadingMoreReplies}
+                                    disabled={commentsLoading}
                                     className="rounded-full border-border text-foreground hover:bg-muted bg-transparent"
                                 >
-                                    {loadingMoreReplies ? (
+                                    {commentsLoading ? (
                                         <>
                                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                            Loading...
+                                            Cargando...
                                         </>
                                     ) : (
-                                        "Show more replies"
+                                        "Mostrar más respuestas"
                                     )}
                                 </Button>
                             </div>
                         )}
                     </div>
-                )} */}
+                )}
             </main>}
         </div>
     )
