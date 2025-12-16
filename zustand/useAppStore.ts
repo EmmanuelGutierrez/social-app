@@ -5,7 +5,7 @@ type appStore = {
   setIsLoading: (isLoading: boolean) => void;
 };
 
-export const useAppStore = create<appStore>((set) => ({
+export const useAppStore = create<appStore>((set, get) => ({
   isLoading: false,
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
 }));

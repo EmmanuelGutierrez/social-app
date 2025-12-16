@@ -22,7 +22,7 @@ export default function VogelPostDetailPage() {
 
     // const { isLoading } = useApp()
     const { getPostAndAllComments, postAndAllComments, postAndAllCommentsLoading,
-        getComments, commentsLoading } = usePost()
+        getComments, commentsLoading, getAncestorsComments, ancestorsCommentsLoading } = usePost()
     const getPostData = useEffectEvent((postId: string) => {
         getPostAndAllComments(postId)
     })
@@ -46,6 +46,12 @@ export default function VogelPostDetailPage() {
     const loadMoreReplies = async () => {
         if (postAndAllComments?.replies.nextCursor) {
             await getComments(postId, postAndAllComments?.replies.nextCursor)
+        }
+    }
+
+    const loadMoreAncestors = async () => {
+        if (postAndAllComments?.ancestors.nextCursor) {
+            await getAncestorsComments(postAndAllComments.ancestors.nextCursor)
         }
     }
 
@@ -115,37 +121,38 @@ export default function VogelPostDetailPage() {
 
             {postAndAllComments && <main className="max-w-2xl mx-auto px-4 py-6">
                 {/* Parent Posts (Thread above) */}
-                {/* parentPosts.length > 0 && (
+                {postAndAllComments.ancestors.data.length > 0 && (
                     <div className="mb-4">
-                        {hiddenParentsCount > 0 && !showMoreParents && (
+                        {postAndAllComments.ancestors.hasMore && (
                             <button
-                                onClick={() => setShowMoreParents(true)}
+                                onClick={() => loadMoreAncestors()}
                                 className="w-full py-3 text-sm text-accent hover:underline mb-4"
                             >
-                                Show {hiddenParentsCount} more {hiddenParentsCount === 1 ? "reply" : "replies"} above
+                                Show {postAndAllComments.ancestors.data.length - 2} more {postAndAllComments.ancestors.data.length === 1 ? "reply" : "replies"} above
                             </button>
                         )}
 
                         <div className="space-y-4">
                             <AnimatePresence>
-                                {visibleParents.map((parent, index) => (
+                                {postAndAllComments.ancestors.data.map((parent, index) => (
                                     <motion.div
-                                        key={parent.id}
+                                        key={parent.post._id}
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.1 }}
                                     >
-                                        <VogelPostCard post={parent} variant="compact" />
+                                        <PostDisplay postData={parent} variant="compact" />
+                                        <div className="flex justify-start pl-9 my-2 w-2 h-6">
+                                            <Separator orientation="vertical" />
+                                        </div>
                                     </motion.div>
                                 ))}
                             </AnimatePresence>
                         </div>
 
-                        <div className="flex justify-start pl-9 my-2">
-                            <div className="w-0.5 h-4 bg-border" />
-                        </div>
+
                     </div>
-                ) */}
+                )}
 
                 {/* Main Post */}
                 <motion.div
@@ -166,7 +173,7 @@ export default function VogelPostDetailPage() {
                 {/* Replies Section */}
                 {postAndAllComments.replies.data.length > 0 && (
                     <div>
-                        <h2 className="text-lg font-semibold text-foreground mb-4">Replies</h2>
+                        {/* <h2 className="text-lg font-semibold text-foreground mb-4">Replies</h2> */}
 
                         <div className="space-y-4">
                             <AnimatePresence mode="popLayout">
@@ -179,12 +186,11 @@ export default function VogelPostDetailPage() {
                                         transition={{ delay: index * 0.05 }}
                                     >
 
-                                        <div className="flex">
-                                            {/* <div className="min-h-0">
-                                                <Separator orientation="vertical" className=" ml-8 mr-3" />
-                                            </div> */}
-                                            <PostDisplay postData={reply} variant="compact" />
+                                        <div className="flex justify-start pl-9 my-2 w-2 h-4">
+                                            <Separator orientation="vertical" className="bg-border/20"/>
                                         </div>
+                                        <PostDisplay postData={reply} variant="compact" />
+
                                     </motion.div>
                                 ))}
                             </AnimatePresence>

@@ -11,15 +11,23 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export const UserDropdown = () => {
   const { user, logoutUser, getMe, hasHydrated } = useAuth();
+  const router = useRouter();
   useEffect(() => {
     if (hasHydrated) {
       getMe();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasHydrated]);
+
+  const handleLogout = () => {
+    logoutUser();
+    router.push("/auth");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -53,7 +61,7 @@ export const UserDropdown = () => {
             <Settings />
             Configuracion
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={logoutUser}>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut />
             Cerrar sesion
           </DropdownMenuItem>

@@ -9,7 +9,7 @@ import { useMyFeed } from "@/hooks/useMyFeed";
 export const PostContainer = () => {
   const loaderRef = useRef<HTMLDivElement>(null)
   const { myFeed, loadMore, loading } = useMyFeed();
-
+  console.log("MY FEED", myFeed)
   useEffect(() => {
     const element = loaderRef.current
     if (!element) {

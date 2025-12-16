@@ -1,7 +1,7 @@
-query MyFeed($params: FilterFeedPostInput!) {
-  myFeed(params: $params) {
-    hasMore
+query GetAncestorsComments($postId: String!) {
+  getAncestorsComments(postId: $postId) {
     nextCursor
+    hasMore
     data {
       iLiked
       likeCount
@@ -9,6 +9,12 @@ query MyFeed($params: FilterFeedPostInput!) {
       post {
         _id
         reactionsCount
+        replyTo {
+          _id
+          authorId {
+            _id
+          }
+        }
         authorId {
           _id
           username
@@ -29,13 +35,6 @@ query MyFeed($params: FilterFeedPostInput!) {
         }
         tags
         title
-        replyTo {
-          _id
-          authorId {
-            username
-            _id
-          }
-        }
       }
     }
   }

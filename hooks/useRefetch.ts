@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 export const useRefetch = ({
   refetch,
   params,
-  refreshInterval = 15000,
+  refreshInterval = 1000*60,
 }: {
   refetch: (params?: any) => any;
   params?: any;

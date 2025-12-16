@@ -7,6 +7,7 @@ const config: CodegenConfig = {
     "./graphql/queries/*.{ts,tsx,graphql,gql}",
     "./graphql/mutations/*.{ts,tsx,graphql,gql}",
     "./graphql/fragments/*.{ts,tsx,graphql,gql}",
+    "./graphql/subscription/*.{ts,tsx,graphql,gql}",
   ],
   generates: {
     // "./graphql/types/types.generated.ts": {

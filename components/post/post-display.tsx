@@ -80,7 +80,7 @@ export default function PostDisplay({
   return (
     <Card ref={ref} onClick={handlePostClick} className={`w-full hover:bg-primary-darker/50 transform 
     delay-75 hover:shadow-lg transition-all cursor-pointer duration-200 border border-primary/20  
-    ${variant === "compact" ? "py-1" : "py-4"} gap-0 flex flex-row mt-8 rounded-sm` } >
+    ${variant === "compact" ? "py-1" : "py-4"} gap-0 flex flex-row mt-8 rounded-sm my-6` } >
       <div className={`${variant === "compact" ? "py-2" : "py-4"} pl-4`}>
         <Avatar className="h-10 w-10">
           <AvatarImage className="object-cover"

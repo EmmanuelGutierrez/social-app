@@ -36,7 +36,10 @@ export function LoginForm() {
   async function onSubmit(dataForm: z.infer<typeof formSchema>) {
     try {
       // setLoading(true);
-      await login(dataForm);
+      const res=await login(dataForm);
+      if(!res.data?.login.tokenWs){
+       throw new Error("Error al iniciar sesión") 
+      }
       toast.success("You submitted the following values:", {
         description: (
           <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">

@@ -8,6 +8,10 @@ import {
   CreatePostMutationMutation,
   GetCommentsDocument,
   GetCommentsQuery,
+  GetAncestorsCommentsDocument,
+  GetAncestorsCommentsQuery,
+  GetPostsByIdsDocument,
+  GetPostsByIdsQuery,
 } from "@/graphql/types/graphql";
 import { ApolloCache } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
@@ -100,6 +104,56 @@ const mergeMoreReplies = (
   });
 };
 
+const mergeAncestorsComments = (
+  cache: ApolloCache,
+  newAncestorsComments: FormattedExecutionResult<
+    GetAncestorsCommentsQuery,
+    ObjMap<unknown>
+  >
+) => {
+  cache.modify({
+    fields: {
+      postAndAllComments: (existing, {}) => {
+        if (!newAncestorsComments.data?.getAncestorsComments) {
+          return existing;
+        }
+        return {
+          ...existing,
+          ancestorsComments: {
+            ...newAncestorsComments.data.getAncestorsComments,
+            data: [
+              ...existing.ancestorsComments.data,
+              ...newAncestorsComments.data.getAncestorsComments.data,
+            ],
+          },
+        };
+      },
+    },
+  });
+};
+
+const mergePostsByIds = (
+  cache: ApolloCache,
+  newPosts: FormattedExecutionResult<GetPostsByIdsQuery, ObjMap<unknown>>
+) => {
+  cache.modify({
+    fields: {
+      myFeed: (existing) => {
+        if (!newPosts.data?.getPostsByIds) {
+          return existing;
+        }
+
+        const data = [...newPosts.data?.getPostsByIds,...existing.data, ];
+        const newFeedData = {
+          ...existing,
+          data,
+        };
+        return newFeedData;
+      },
+    },
+  });
+};
+
 export const usePost = () => {
   // const { setIsLoading } = useApp();
   const [likePostMutation, likePostData] = useMutation(LikePostDocument, {
@@ -132,15 +186,22 @@ export const usePost = () => {
     client: apolloClient,
   });
 
+  const [commentsFetch, { data: commentsData, loading: commentsLoading }] =
+    useLazyQuery(GetCommentsDocument, {
+      client: apolloClient,
+    });
+
   const [
-    commentsFetch,
-    {
-      data: commentsData,
-      loading: commentsLoading,
-    },
-  ] = useLazyQuery(GetCommentsDocument, {
+    ancestorsCommentsFetch,
+    { data: ancestorsCommentsData, loading: ancestorsCommentsLoading },
+  ] = useLazyQuery(GetAncestorsCommentsDocument, {
     client: apolloClient,
   });
+
+  const [
+    getPostsByIdsFetch,
+    { data: getPostsByIdsData, loading: getPostsByIdsLoading },
+  ] = useLazyQuery(GetPostsByIdsDocument, { client: apolloClient });
 
   async function createPost(data: CreatePostInput, files?: FileList) {
     const res = await createPostMutation({
@@ -152,12 +213,32 @@ export const usePost = () => {
     return res;
   }
 
+  async function getPostsByIds(postsIds: string[]) {
+    const res = await getPostsByIdsFetch({
+      variables: {
+        postsIds,
+      },
+    });
+    mergePostsByIds(apolloClient.cache, res);
+    return res;
+  }
+
   async function getPostAndAllComments(postId: string) {
     const res = await postAndCommentsFetch({
       variables: {
         postId,
       },
     });
+    return res;
+  }
+
+  async function getAncestorsComments(postId: string) {
+    const res = await ancestorsCommentsFetch({
+      variables: {
+        postId,
+      },
+    });
+    mergeAncestorsComments(apolloClient.cache, res);
     return res;
   }
 
@@ -199,6 +280,12 @@ export const usePost = () => {
     getComments,
     commentsData,
     commentsLoading,
+    getAncestorsComments,
+    ancestorsCommentsData,
+    ancestorsCommentsLoading,
+    getPostsByIds,
+    getPostsByIdsData,
+    getPostsByIdsLoading,
     likePostError: likePostData.error,
     likePostLoading: likePostData.loading,
     dislikePostError: dislikePostData.error,

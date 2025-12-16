@@ -7,7 +7,7 @@ import {
   MeQueryDocument,
   RegisterMutationDocument,
 } from "@/graphql/types/graphql";
-import {  createAuthStore } from "@/zustand/useAuthStore";
+import { createAuthStore } from "@/zustand/useAuthStore";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { useApp } from "./useApp";
 
@@ -17,9 +17,8 @@ import { useApp } from "./useApp";
 // };
 
 export const useAuth = () => {
-  const { hasHydrated, user, setTokenWs, logout, setUser } =
-    createAuthStore();
-  const {setIsLoading}=useApp()
+  const { hasHydrated, user, setTokenWs, logout, setUser } = createAuthStore();
+  const { setIsLoading } = useApp();
   const [registerMutation, registerData] = useMutation(
     RegisterMutationDocument,
     {
@@ -33,15 +32,17 @@ export const useAuth = () => {
       },
     }
   );
-  
+
   const [meQuery, meData] = useLazyQuery(MeQueryDocument, {
     client: apolloClient,
-    fetchPolicy:"network-only"
+    fetchPolicy: "network-only",
   });
   const [loginMutation, loginData] = useMutation(LoginMutationDocument, {
     client: apolloClient,
+    fetchPolicy: "network-only",
     onCompleted: async (data) => {
       if (data?.login.tokenWs) {
+        localStorage.setItem("tokenWs", data?.login.tokenWs);
         setTokenWs(data.login.tokenWs);
         const meRes = await meQuery();
         setUser(meRes.data?.meQuery);
@@ -52,39 +53,23 @@ export const useAuth = () => {
     client: apolloClient,
   });
 
-  // if (!authStore) {
-  //   return {
-  //     user: null,
-  //     login: () => {},
-  //     register: () => {},
-  //     logoutUser: () => {},
-  //     getMe: () => {},
-  //     errorLogin: undefined,
-  //     errorRegister: undefined,
-  //     meError: undefined,
-  //     loadingLogin: false,
-  //     loadingRegister: false,
-  //     hasHydrated: false,
-  //   };
-  // }
-  // const { user, setUser, logout, hasHydrated } = authStore;
-
   const getMe = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     const { data } = await meQuery();
     setUser(data?.meQuery);
-    setIsLoading(false)
+    setIsLoading(false);
   };
 
-  const login = (loginData: LoginInput) => {
-    setIsLoading(true)
-    return loginMutation({ variables: { loginInput: loginData } });
-    setIsLoading(false)
+  const login = async (loginData: LoginInput) => {
+    setIsLoading(true);
+    const res = await loginMutation({ variables: { loginInput: loginData } });
+    setIsLoading(false);
+    return res;
   };
 
-  const register = (input: CreateUserInput, file?: File) => {
-    setIsLoading(true)
-    return registerMutation({
+  const register = async (input: CreateUserInput, file?: File) => {
+    setIsLoading(true);
+    const res = await registerMutation({
       variables: {
         register: input,
         file: {
@@ -92,14 +77,15 @@ export const useAuth = () => {
         },
       },
     });
-    setIsLoading(false)
+    setIsLoading(false);
+    return res;
   };
 
   const logoutUser = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     await logoutMutation();
     logout();
-    setIsLoading(false)
+    setIsLoading(false);
   };
 
   return {

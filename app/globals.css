@@ -178,9 +178,9 @@
   /* --background: oklch(1 0 0); */
   --foreground:oklch(0.984 0.003 247.858);
   --card: var(--color-primary-darker);
-  --card-foreground: var(--text)
+  --card-foreground: var(--text);
   --popover: var(--color-primary-darker);
-  --popover-foreground: var(--text)
+  --popover-foreground: var(--text);
   --primary: var(--color-primary-darker);
   --primary-foreground: oklch(0.984 0.003 247.858);
   --secondary: var(--color-secondary);

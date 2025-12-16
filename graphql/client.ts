@@ -2,24 +2,55 @@ import { InMemoryCache, Observable } from "@apollo/client";
 import { ApolloClient } from "@apollo/client";
 import {
   LogoutMutationDocument,
-  MyFeedQuery,
   RotateAccessTokenDocument,
 } from "./types/graphql";
 import { ErrorLink } from "@apollo/client/link/error";
 import { ApolloLink } from "@apollo/client";
 import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
 
 // const httpLink = new HttpLink({
 //   uri: "http://localhost:3001/graphql",
 //   credentials: "include",
 // });
 const uploadLink = new UploadHttpLink({
-  uri: "http://localhost:3001/graphql",
+  uri: `${process.env["NEXT_PUBLIC_PROD"] ? "https" : "http"}://${
+    process.env["BACKEND_URL"] ?? process.env["NEXT_PUBLIC_BACKEND_URL"]
+  }/graphql`,
   credentials: "include",
   headers: {
     "Apollo-Require-Preflight": "true",
   },
 });
+
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: `ws://${
+      process.env["BACKEND_URL"] ?? process.env["NEXT_PUBLIC_BACKEND_URL"]
+    }/graphql`,
+    on:{
+      connected(){
+        console.log("CWS onnected")
+      },
+      error(){
+        console.log("WS Error")
+      },
+      closed(){
+        console.log("WS Closed")
+      }
+      
+    },
+    connectionParams() {
+      const token= localStorage.getItem("tokenWs")
+      console.log("TOKEN WS", token)
+      return {
+        Authorization: `${token}`,
+      };
+    },
+  })
+);
 
 export const apolloClientPlain = new ApolloClient({
   link: uploadLink,
@@ -35,10 +66,10 @@ async function refreshAccessToken() {
     console.log("DATA AND ERROR", data, error);
     if (data?.rotateAccessToken) {
       localStorage.setItem("tokenWs", data?.rotateAccessToken.tokenWs);
-      console.log("Return ok");
+      // wsLink.client.dispose();
+      // wsLink.client.
       return true;
     }
-    console.log("Return false");
     await apolloClientPlain.mutate({
       mutation: LogoutMutationDocument,
     });
@@ -92,79 +123,24 @@ const errorLink = new ErrorLink(({ forward, error, operation }) => {
       })();
     });
   }
-  // else {
-  //   console.log("ERROR 3", isAuthError)
-  //   // "funcione para todos los errores" -> Logout
-  //   // We can't easily await the logout mutation here if we return void,
-  //   // but we can fire it and redirect.
-  //   sessionStorage.clear();
-  //   // Optional: Trigger logout mutation fire-and-forget
-  //   apolloClientPlain.mutate({ mutation: LogoutMutationDocument }).then(() => {
-
-  //     window.location.href = "/auth";
-  //   }).catch(console.error);
-  // }
 });
 
-// const errorLink = new ErrorLink(({ error, forward, operation }) => {
-//   // 1. Identify if it's an Auth Error
-//   let isAuthError = false;
-
-//   if (error) {
-//     isAuthError = ["unauthenticated", "unauthorized"].includes(error.message.toLowerCase())
-//   }
-
-//   // // Also check networkError if needed (e.g. 401)
-//   // if (networkError && 'statusCode' in networkError && networkError.statusCode === 401) {
-//   //   isAuthError = true;
-//   // }
-//   // 2. Handle Auth Error (Refresh Flow)
-//   if (isAuthError) {
-//     return new Observable((observer) => {
-//       refreshAccessToken().then((refreshed) => {
-//         if (!refreshed) {
-//           // Refresh failed -> Logout
-//           window.location.href = "/auth";
-//           observer.error(error || new Error("Auth failed"));
-//           return;
-//         }
-
-//         // Refresh success -> Retry
-//         const subscription = forward(operation).subscribe({
-//           next: observer.next.bind(observer),
-//           error: observer.error.bind(observer),
-//           complete: observer.complete.bind(observer),
-//         });
-//         return () => subscription.unsubscribe();
-//       }).catch((err) => {
-//         observer.error(err);
-
-//       });
-//     });
-//   }
-//   // 3. Handle All Other Errors (Logout Flow)
-//   if (error) {
-//     // "funcione para todos los errores" -> Logout
-//     // We can't easily await the logout mutation here if we return void,
-//     // but we can fire it and redirect.
-//     sessionStorage.clear();
-//     // Optional: Trigger logout mutation fire-and-forget
-//     apolloClientPlain.mutate({ mutation: LogoutMutationDocument }).catch(console.error);
-//     window.location.href = "/auth";
-//   }
-// });
-
-/* 
-const link = ApolloLink.from([
-  new RetryLink(),
-  new MyAuthLink(),
-  new HttpLink({ uri: "http://localhost:4000/graphql" }),
-]);
-*/
 const links = ApolloLink.from([errorLink, uploadLink]);
 
+const splitLink = ApolloLink.split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  links
+);
+
 export const apolloClient = new ApolloClient({
-  link: links,
+  link: splitLink,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -187,20 +163,16 @@ export const apolloClient = new ApolloClient({
                 hasMore: boolean;
               }
             ) {
-              console.log(
-                "MERGE",
-                incoming,
-                existing,
+              console.log("MERGE", incoming, existing);
+              const existingIds = existing.data.map(
+                (post) => post.post.__ref || `Post:${post.post._id}`
               );
-              // if (!existing) {
-              //   return incoming;
-              // }
-              const existingIds = existing.data.map((post) => post.post.__ref || `Post:${post.post._id}`);
-              console.log("Existing", existing, existingIds);
+
               const data = [
                 ...existing.data,
                 ...incoming.data.filter(
-                  (p) => !existingIds.includes(p.post.__ref || `Post:${p.post._id}`)
+                  (p) =>
+                    !existingIds.includes(p.post.__ref || `Post:${p.post._id}`)
                 ),
               ];
               console.log("Data", data);
