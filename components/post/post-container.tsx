@@ -1,5 +1,4 @@
 "use client";
-import { usePost } from "@/hooks/usePost";
 import PostDisplay from "./post-display";
 import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";

@@ -4,9 +4,10 @@ query MeQuery {
     createdAt
     updatedAt
     email
+    followersCount
+    followingCount
     followers {
-      followDate
-      user {
+      follower {
         _id
         name
         lastname
@@ -17,11 +18,9 @@ query MeQuery {
         }
         username
       }
-      _id
     }
     following {
-      followDate
-      user {
+      following {
         _id
         name
         lastname
@@ -32,7 +31,6 @@ query MeQuery {
         }
         username
       }
-      _id
     }
     lastname
     name

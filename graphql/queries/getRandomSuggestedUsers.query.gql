@@ -1,0 +1,12 @@
+query RandomSuggestedUsers {
+  suggestedUsers {
+    _id
+    name
+    lastname
+    username
+    profileImg {
+      _id
+      secure_url
+    }
+  }
+}

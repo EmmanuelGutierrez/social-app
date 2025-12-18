@@ -12,6 +12,7 @@ query GetAncestorsComments($postId: String!) {
         replyTo {
           _id
           authorId {
+            username
             _id
           }
         }

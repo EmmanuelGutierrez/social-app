@@ -25,8 +25,6 @@ import { SlidingCounter } from "../common/SlidingCounter";
 import { MyFeedQuery } from "@/graphql/types/graphql";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useRouter } from "next/navigation";
-import { Separator } from "../ui/separator";
-
 interface PostDisplayProps {
   postData: MyFeedQuery["myFeed"]["data"][number]
   variant?: "default" | "compact"

@@ -12,6 +12,7 @@ query GetComments($postId: String!, $cursor: String) {
         replyTo {
           _id
           authorId {
+            username
             _id
           }
         }

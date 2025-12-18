@@ -8,7 +8,7 @@ import { useEffect } from "react"
 import { usePost } from "@/hooks/usePost"
 
 export const NewPostsNotification = () => {
-    const { notifications, newNotificationsData, setNewNotificationsData, setNotifications, clearsetNewNotificationsData } = useNotification()
+    const { notifications, setNewNotificationsData, setNotifications, clearsetNewNotificationsData } = useNotification()
     const { getPostsByIds, getPostsByIdsLoading } = usePost()
     useNotificationSubscription((data) => {
         if (data.data?.subNewPosts) {
@@ -22,7 +22,7 @@ export const NewPostsNotification = () => {
     })
 
     useEffect(() => {
-        const id = setInterval(() => { 
+        const id = setInterval(() => {
             setNotifications()
         }, 1000 * 60);
         return () => clearInterval(id);
