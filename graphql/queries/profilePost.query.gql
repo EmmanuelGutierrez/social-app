@@ -1,0 +1,46 @@
+query ProfilePosts(
+  $multimediaPostParams: FilterInput!
+  $likedPostsParams: FilterInput!
+  $userPostsParams: FilterInput!
+) {
+  multimediaPosts: userPosts(params: $multimediaPostParams) {
+    hasMore
+    nextCursor
+    data {
+      post {
+        _id
+        images {
+          _id
+          public_id
+          secure_url
+        }
+      }
+    }
+  }
+  likedPosts(params: $likedPostsParams) {
+    hasMore
+    nextCursor
+    data {
+      iLiked
+      likeCount
+      replyCount
+      post {
+        _id
+        ...PostFragment
+      }
+    }
+  }
+  userPosts(params: $userPostsParams) {
+    hasMore
+    nextCursor
+    data {
+      iLiked
+      likeCount
+      replyCount
+      post {
+        _id
+        ...PostFragment
+      }
+    }
+  }
+}

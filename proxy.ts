@@ -3,7 +3,6 @@ import type { NextRequest, ProxyConfig } from "next/server";
 
 export function proxy(request: NextRequest) {
   const token = request.cookies.get("access_token")?.value; // Tu JWT HttpOnly
-  console.log("TOKEN", request);
   const { pathname } = request.nextUrl;
   console.log("PATHNAME", pathname);
   // ✅ Rutas públicas (por ejemplo, login y registro)
@@ -11,7 +10,7 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/auth") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/public") ||
-    pathname === "/favicon.ico";
+    pathname === "/favicon.ico"||pathname.startsWith("/graphql");
   // Si no está logeado y la ruta no es pública → redirige al login
   console.log("redirect", !token, !isPublicPath);
   if (!token && !isPublicPath) {

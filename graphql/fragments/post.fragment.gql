@@ -1,5 +1,4 @@
 fragment PostFragment on Post {
-  _id
   reactionsCount
   authorId {
     _id
@@ -21,4 +20,11 @@ fragment PostFragment on Post {
   }
   tags
   title
+  replyTo {
+    _id
+    authorId {
+      username
+      _id
+    }
+  }
 }

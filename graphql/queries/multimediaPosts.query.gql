@@ -1,0 +1,16 @@
+query MultimediaPost($params: FilterInput!) {
+  userPosts(params: $params) {
+    hasMore
+    nextCursor
+    data {
+      post {
+        _id
+        images {
+          _id
+          public_id
+          secure_url
+        }
+      }
+    }
+  }
+}

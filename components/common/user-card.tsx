@@ -14,7 +14,7 @@ export default function UserCard() {
                 <CardHeader className="space-y-4">
                     <div className="flex flex-col items-center text-center">
                         <Avatar className="h-20 w-20 mb-3">
-                            <AvatarImage src={user?.profileImg?.secure_url || "/placeholder.svg"} alt={user?.name} />
+                            <AvatarImage className="object-cover" src={user?.profileImg?.secure_url || "/placeholder.svg"} alt={user?.name} />
                             <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <Link href={`/profile/${user?.username}`} className="hover:underline">

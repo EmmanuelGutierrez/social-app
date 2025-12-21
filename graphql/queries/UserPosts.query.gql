@@ -1,5 +1,5 @@
-query MyFeed($params: FilterFeedPostInput!) {
-  myFeed(params: $params) {
+query UserPosts($params: FilterInput!) {
+  userPosts(params: $params) {
     hasMore
     nextCursor
     data {

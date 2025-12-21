@@ -1,26 +1,27 @@
 import { apolloClient } from "@/graphql/client";
-import { MyFeedDocument, MyFeedQuery } from "@/graphql/types/graphql";
+import { UserPostsDocument } from "@/graphql/types/graphql";
 import { useQuery } from "@apollo/client/react";
 
-export function useMyFeed() {
+export function useUserPosts(username: string) {
   const {
-    data: myFeed,
-    loading,
-    error,
+    data: userPosts,
+    loading: userPostsLoading,
+    error: userPostsError,
     fetchMore,
-  } = useQuery<MyFeedQuery>(MyFeedDocument, {
+  } = useQuery(UserPostsDocument, {
     client: apolloClient,
     variables: {
       params: {
         limit: 5,
         cursorDate: null,
+        username,
       },
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
   const loadMore = () => {
-    if (!myFeed?.myFeed.hasMore) {
+    if (!userPosts?.userPosts.hasMore) {
       return;
     }
 
@@ -28,11 +29,11 @@ export function useMyFeed() {
       variables: {
         params: {
           limit: 5,
-          cursorDate: myFeed.myFeed.nextCursor,
+          cursorDate: userPosts.userPosts.nextCursor,
           // tags,
         },
       },
     });
   };
-  return { myFeed, loading, error, loadMore };
+  return { userPosts, userPostsLoading, userPostsError, loadMore };
 }

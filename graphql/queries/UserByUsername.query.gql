@@ -1,0 +1,22 @@
+query UserByUsername($username: String!) {
+  userByUsername(username: $username) {
+   user {
+      _id
+    createdAt
+    updatedAt
+    email
+    followersCount
+    followingCount
+    lastname
+    name
+    bio
+    profileImg {
+      _id
+      secure_url
+      url
+    }
+    username
+   }
+   isFollowing
+  }
+}

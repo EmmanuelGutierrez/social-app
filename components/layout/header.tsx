@@ -1,5 +1,4 @@
 
-import { Button } from "../ui/button";
 // import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import logo from "../../media/logo/logo-dark-transparent.png";
 import Image from "next/image";

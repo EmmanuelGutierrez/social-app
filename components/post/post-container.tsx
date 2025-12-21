@@ -3,12 +3,13 @@ import PostDisplay from "./post-display";
 import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { motion } from "motion/react"
-import { useMyFeed } from "@/hooks/useMyFeed";
+import { MyFeedQuery } from "@/graphql/types/graphql";
 
-export const PostContainer = () => {
+export const PostContainer = ({ postsData, loadMore, loading }: { loadMore: () => void, loading: boolean, postsData?: MyFeedQuery['myFeed'] }) => {
   const loaderRef = useRef<HTMLDivElement>(null)
-  const { myFeed, loadMore, loading } = useMyFeed();
-  console.log("MY FEED", myFeed)
+  // const { postsData, loadMore, loading } = useMyFeed();
+
+  console.log("MY FEED", postsData)
   useEffect(() => {
     const element = loaderRef.current
     if (!element) {
@@ -23,11 +24,11 @@ export const PostContainer = () => {
     return () => {
       observer.unobserve(element)
     }
-  }, [loadMore, myFeed?.myFeed.nextCursor])
+  }, [loadMore, postsData?.nextCursor])
   return (
     <>
-      {myFeed ? (
-        myFeed?.myFeed.data.map((postData,) => {
+      {postsData ? (
+        postsData?.data.map((postData,) => {
           return (
             <motion.div key={postData.post._id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 0.95 }} transition={{ duration: 0.4, delay: 1.5 }}>
@@ -43,7 +44,7 @@ export const PostContainer = () => {
       ) : (
         <></>
       )} <div ref={loaderRef} className="flex justify-center py-8">
-        {(!myFeed || (myFeed?.myFeed.hasMore && loading)) && (
+        {(!postsData || (postsData?.hasMore && loading)) && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />
             <span>Cargando más posts...</span>
@@ -51,7 +52,7 @@ export const PostContainer = () => {
         )}
 
         {
-          !loading && (!myFeed || !myFeed?.myFeed.hasMore && myFeed?.myFeed.data.length > 0) && (
+          !loading && (!postsData || !postsData?.hasMore && postsData?.data.length > 0) && (
             <div className="text-center text-muted-foreground">No hay más posts para mostrar</div>
           )}
       </div>

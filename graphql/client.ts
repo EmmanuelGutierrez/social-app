@@ -16,7 +16,7 @@ import { createClient } from "graphql-ws";
 //   credentials: "include",
 // });
 const uploadLink = new UploadHttpLink({
-  uri: `${process.env["NEXT_PUBLIC_PROD"] ? "https" : "http"}://${
+  uri: `${
     process.env["BACKEND_URL"] ?? process.env["NEXT_PUBLIC_BACKEND_URL"]
   }/graphql`,
   credentials: "include",
@@ -27,8 +27,8 @@ const uploadLink = new UploadHttpLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: `ws://${
-      process.env["BACKEND_URL"] ?? process.env["NEXT_PUBLIC_BACKEND_URL"]
+    url: `${
+      process.env["BACKEND_WS_URL"] ?? process.env["NEXT_PUBLIC_BACKEND_WS_URL"]
     }/graphql`,
     on:{
       connected(){

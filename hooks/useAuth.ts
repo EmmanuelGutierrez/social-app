@@ -23,6 +23,7 @@ export const useAuth = () => {
     RegisterMutationDocument,
     {
       client: apolloClient,
+      fetchPolicy: "network-only",
       onCompleted: async (data) => {
         if (data?.register.tokenWs) {
           setTokenWs(data.register.tokenWs);
@@ -68,16 +69,13 @@ export const useAuth = () => {
   };
 
   const register = async (input: CreateUserInput, file?: File) => {
-    setIsLoading(true);
+    console.log("File",file)
     const res = await registerMutation({
       variables: {
         register: input,
-        file: {
-          file,
-        },
+        file: file,
       },
     });
-    setIsLoading(false);
     return res;
   };
 

@@ -6,6 +6,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { ControllerRenderProps } from "react-hook-form";
 import * as z from "zod";
+import imageComp from "browser-image-compression";
 
 interface AvatarUploadEditButtonI {
   field: ControllerRenderProps<
@@ -28,7 +29,7 @@ export default function AvatarUploadEditButton({
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (files: FileList | null) => {
+  const handleImageChange =async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
@@ -39,11 +40,15 @@ export default function AvatarUploadEditButton({
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("La imagen no debe superar 5MB");
-      return;
+    if (file.size > 2 * 1024 * 1024) {
+      const compressedFile = await imageComp(file, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 1200,
+      });
+      field.onChange(compressedFile);
+    } else {
+      field.onChange(file);
     }
-    field.onChange(file);
     if (file) {
       console.log("FILE CH", file);
       setPreview(URL.createObjectURL(file));
@@ -113,11 +118,11 @@ export default function AvatarUploadEditButton({
         accept="image/png,image/jpeg,image/webp"
         onChange={(e) => {
           handleImageChange(e.target.files);
-          
+
         }}
         className="hidden"
       />
-    
+
     </div>
   );
 }
