@@ -12,9 +12,10 @@ query MeQuery {
         name
         lastname
         profileImg {
+          _id
           secure_url
           url
-          _id
+          public_id
         }
         username
       }
@@ -25,9 +26,10 @@ query MeQuery {
         name
         lastname
         profileImg {
+          _id
           secure_url
           url
-          _id
+          public_id
         }
         username
       }
@@ -38,8 +40,17 @@ query MeQuery {
       _id
       secure_url
       url
+      public_id
     }
+    bannerImg {
+      _id
+      secure_url
+      url
+      public_id
+    }
+    bio
     role
     username
+    birth_date
   }
 }

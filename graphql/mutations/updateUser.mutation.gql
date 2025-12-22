@@ -1,0 +1,35 @@
+mutation UpdateUser(
+  $updateUserInput: UpdateUserInput!
+  $bannerImg: Upload
+  $profileImg: Upload
+) {
+  updateUser(
+    updateUserInput: $updateUserInput
+    bannerImg: $bannerImg
+    profileImg: $profileImg
+  ) {
+    _id
+    bannerImg {
+      _id
+      secure_url
+      url
+      public_id
+    }
+    bio
+    createdAt
+    email
+    followersCount
+    followingCount
+    lastname
+    name
+    profileImg {
+      _id
+      secure_url
+      url
+      public_id
+    }
+    role
+    updatedAt
+    username
+  }
+}

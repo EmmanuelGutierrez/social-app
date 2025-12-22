@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -38,9 +38,9 @@ export default function UserCard() {
                         </div>
                     </div>
 
-                    <Button asChild className="w-full bg-transparent" variant="outline">
+                    {/* <Button asChild className="w-full bg-transparent" variant="outline">
                         <Link href={`/profile/${user.username}`}>Ver perfil</Link>
-                    </Button>
+                    </Button> */}
                 </CardContent>
             </Card> : <></>}
         </>

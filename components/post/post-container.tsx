@@ -9,7 +9,6 @@ export const PostContainer = ({ postsData, loadMore, loading }: { loadMore: () =
   const loaderRef = useRef<HTMLDivElement>(null)
   // const { postsData, loadMore, loading } = useMyFeed();
 
-  console.log("MY FEED", postsData)
   useEffect(() => {
     const element = loaderRef.current
     if (!element) {
@@ -43,7 +42,8 @@ export const PostContainer = ({ postsData, loadMore, loading }: { loadMore: () =
         })
       ) : (
         <></>
-      )} <div ref={loaderRef} className="flex justify-center py-8">
+      )}
+      <div ref={loaderRef} className="flex justify-center py-8">
         {(!postsData || (postsData?.hasMore && loading)) && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />

@@ -1,22 +1,57 @@
 query UserByUsername($username: String!) {
   userByUsername(username: $username) {
-   user {
+    user {
       _id
-    createdAt
-    updatedAt
-    email
-    followersCount
-    followingCount
-    lastname
-    name
-    bio
-    profileImg {
-      _id
-      secure_url
-      url
+      createdAt
+      email
+      followersCount
+      followingCount
+      followers {
+        follower {
+          _id
+          name
+          lastname
+          profileImg {
+            _id
+            secure_url
+            url
+            public_id
+          }
+          username
+        }
+      }
+      following {
+        following {
+          _id
+          name
+          lastname
+          profileImg {
+            _id
+            secure_url
+            url
+            public_id
+          }
+          username
+        }
+      }
+      lastname
+      name
+      profileImg {
+        _id
+        secure_url
+        url
+        public_id
+      }
+      bannerImg {
+        _id
+        secure_url
+        url
+        public_id
+      }
+      bio
+      username
+      birth_date
     }
-    username
-   }
-   isFollowing
+    isFollowing
   }
 }

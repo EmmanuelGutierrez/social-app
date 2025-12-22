@@ -69,11 +69,10 @@ export const useAuth = () => {
   };
 
   const register = async (input: CreateUserInput, file?: File) => {
-    console.log("File",file)
     const res = await registerMutation({
       variables: {
         register: input,
-        file: file,
+        file: file||null,
       },
     });
     return res;
@@ -92,6 +91,7 @@ export const useAuth = () => {
     register,
     logoutUser,
     getMe,
+    setUser,
     errorLogin: loginData.error,
     errorRegister: registerData.error,
     meError: meData.error,

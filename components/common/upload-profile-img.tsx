@@ -4,39 +4,32 @@ import { Pencil, X, Plus } from "lucide-react";
 import Image from "next/image";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ControllerRenderProps } from "react-hook-form";
-import * as z from "zod";
+import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 import imageComp from "browser-image-compression";
+import { toastCustom } from "@/lib/toastCustom";
 
-interface AvatarUploadEditButtonI {
-  field: ControllerRenderProps<
-    {
-      email: string;
-      password: string;
-      name: string;
-      lastname: string;
-      username: string;
-      birth_date: Date;
-      file: z.core.File;
-    },
-    "file"
-  >;
+
+type THFFieldProps<TFieldValues extends FieldValues, TName extends Path<TFieldValues>> = {
+  field: ControllerRenderProps<TFieldValues, TName>
+  previewUrl?: string | null  
 }
 
-export default function AvatarUploadEditButton({
+
+export default function AvatarUploadEditButton<TFieldValues extends FieldValues, TName extends Path<TFieldValues>>({
   field,
-}: AvatarUploadEditButtonI) {
-  const [preview, setPreview] = useState<string | null>(null);
+  previewUrl
+}: THFFieldProps<TFieldValues, TName>) {
+  const [preview, setPreview] = useState<string | null>(previewUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange =async (files: FileList | null) => {
+  const handleImageChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if (!validTypes.includes(file.type)) {
-      alert("Solo se aceptan JPG, PNG o WebP");
+      toastCustom.error("Formato incorrecto", "Solo se aceptan JPG, PNG o WebP");
       return;
     }
 
@@ -44,13 +37,13 @@ export default function AvatarUploadEditButton({
       const compressedFile = await imageComp(file, {
         maxSizeMB: 2,
         maxWidthOrHeight: 1200,
+        
       });
-      field.onChange(compressedFile);
+      field.onChange(new File([compressedFile], file.name, { type: compressedFile.type }));
     } else {
       field.onChange(file);
     }
     if (file) {
-      console.log("FILE CH", file);
       setPreview(URL.createObjectURL(file));
     }
 

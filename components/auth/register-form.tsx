@@ -44,12 +44,12 @@ const formSchema = z.object({
         !files ||
         ["image/jpeg", "image/png", "image/webp"].includes(files.type),
       "Formato incorrecto"
-    ),
+    ).optional(),
 });
 export function RegisterForm() {
   const router = useRouter();
   const [openCalendar, setOpenCalendar] = useState(false);
-  const { handleSubmit, control } = useForm<z.infer<typeof formSchema>>({
+  const { handleSubmit, control, } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -68,12 +68,10 @@ export function RegisterForm() {
     ...dataForm
   }: z.infer<typeof formSchema>) {
     try {
-      // setLoading(true);
-      console.log("dataForm", dataForm, file);
       await register(
         {
           ...dataForm,
-          birth_date: Math.floor(new Date(birth_date).getTime() / 1000),
+          birth_date: new Date(birth_date).getTime(),
         },
         file
       );
@@ -179,7 +177,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2 ">
-            
+
             <Controller
               name="file"
               control={control}
@@ -195,15 +193,15 @@ export function RegisterForm() {
                     ref={field.ref}
                     multiple={false}
                     onBlur={field.onBlur}
-                    // onChange={(e) => {
-                    //   console.log("file eve", e.target);
-                    //   // const files = e.target.files;
-                    //   // if (files) {
-                    //   //   // console.log('files',files[0].arrayBuffer)
-                    //   //   // field.onChange(files[0]);
-                    //   //   // setPreview(URL.createObjectURL(files[0]));
-                    //   // }
-                    // }}
+                  // onChange={(e) => {
+                  //   console.log("file eve", e.target);
+                  //   // const files = e.target.files;
+                  //   // if (files) {
+                  //   //   // console.log('files',files[0].arrayBuffer)
+                  //   //   // field.onChange(files[0]);
+                  //   //   // setPreview(URL.createObjectURL(files[0]));
+                  //   // }
+                  // }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

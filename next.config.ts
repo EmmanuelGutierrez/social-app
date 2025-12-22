@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     return[{
       source:"/graphql",
       destination:"http://localhost:3001/graphql",
-    }]
+    },]
   },
 };
 

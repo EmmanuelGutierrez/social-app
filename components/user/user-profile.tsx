@@ -3,8 +3,7 @@
 import { useState, useEffect, useEffectEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card } from "@/components/ui/card"
-import { Pencil, UserPlus, UserMinus, Upload, Loader2 } from "lucide-react"
+import { Pencil, UserPlus, UserMinus, Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/hooks/useAuth"
 import { useUserPosts } from "@/hooks/useUserPost"
@@ -14,6 +13,9 @@ import { useFollow } from "@/hooks/useFollow"
 import { toastCustom } from "@/lib/toastCustom"
 import { useLikedPosts } from "@/hooks/useLikedPosts"
 import { MultimediaPost } from "../post/multimedia-post"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
+import { UpdateUserForm } from "./update-user"
+import Image from "next/image"
 
 export default function UserProfile({ username }: { username: string }) {
 
@@ -26,8 +28,6 @@ export default function UserProfile({ username }: { username: string }) {
     const { user: currentUser } = useAuth()
     // Simulated current user - replace with real auth
     const isOwnProfile = username === currentUser?.username
-    const [isEditing, setIsEditing] = useState(false)
-
     const handleIsFollowing = useEffectEvent(() => {
         if (userData) {
             setIsFollowing(userData.isFollowing)
@@ -62,18 +62,16 @@ export default function UserProfile({ username }: { username: string }) {
         }
     }
 
-    const handleBannerUpload = () => {
-        console.log("Banner upload clicked")
-    }
-
-
-
     return (
         <div className="min-h-screen">
             {/* Banner */}
             <div className="relative h-48 md:h-64 bg-linear-to-r from-primary to-primary-dark overflow-hidden group">
-                {/* <Image src={"/placeholder.svg"} alt="Banner" fill className="object-cover" /> */}
-                {isOwnProfile && (
+                {userData.user.bannerImg?.secure_url ? (
+                    <Image src={userData.user.bannerImg?.secure_url} alt="Banner" fill className="object-cover" />
+                ) : (
+                    <div className="absolute inset-0 bg-primary opacity-50"></div>
+                )}
+                {/* {isOwnProfile && (
                     <Button
                         size="sm"
                         variant="secondary"
@@ -83,7 +81,7 @@ export default function UserProfile({ username }: { username: string }) {
                         <Upload className="h-4 w-4 mr-2" />
                         Cambiar banner
                     </Button>
-                )}
+                )} */}
             </div>
 
             {/* Profile Header */}
@@ -100,10 +98,20 @@ export default function UserProfile({ username }: { username: string }) {
                     {/* Action Buttons */}
                     <div className="flex justify-end pt-4 gap-2">
                         {isOwnProfile ? (
-                            <Button variant="outline" onClick={() => setIsEditing(!isEditing)} >
-                                <Pencil className="h-4 w-4 mr-2" />
-                                Editar perfil
-                            </Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline">
+                                        <Pencil className="h-4 w-4 mr-2" />
+                                        Editar perfil
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="border-primary-dark/20">
+                                    <DialogHeader>
+                                        <DialogTitle>Editar perfil</DialogTitle>
+                                    </DialogHeader>
+                                    <UpdateUserForm userData={userData.user} />
+                                </DialogContent>
+                            </Dialog>
                         ) : (
                             <Button disabled={followLoading || unfollowLoading} className="rounded-full" onClick={handleFollowToggle} variant={"default"}>
                                 {isFollowing ? (
@@ -154,7 +162,7 @@ export default function UserProfile({ username }: { username: string }) {
                     </div>
                 </div>
                 {/* Edit Profile Form */}
-                {isEditing && (
+                {/* {isEditing && (
                     <Card className="mt-6 p-6">
                         <h2 className="text-xl font-bold mb-4">Editar perfil</h2>
                         <div className="space-y-4">
@@ -174,14 +182,6 @@ export default function UserProfile({ username }: { username: string }) {
                                     className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-background"
                                 />
                             </div>
-                            {/* <div>
-                                <label className="text-sm font-medium">Ubicación</label>
-                                <input
-                                    type="text"
-                                    defaultValue={userData.user.location}
-                                    className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-background"
-                                />
-                            </div> */}
                             <div className="flex gap-2 justify-end">
                                 <Button variant="outline" onClick={() => setIsEditing(false)}>
                                     Cancelar
@@ -190,7 +190,7 @@ export default function UserProfile({ username }: { username: string }) {
                             </div>
                         </div>
                     </Card>
-                )}
+                )} */}
 
                 {/* Tabs */}
                 <Tabs defaultValue="posts" className="mt-8">
