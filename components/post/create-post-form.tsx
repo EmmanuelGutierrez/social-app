@@ -53,9 +53,7 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
     } catch (e) {
       console.log("e", e);
       toastCustom.error("Error", "Error al crear el post")
-    } finally {
-      // setLoading(false);
-    }
+    } 
   }
 
 
