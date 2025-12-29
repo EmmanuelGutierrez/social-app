@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import z from "zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldLabel } from "../ui/field";
 import CircularProgress from "./circular-progress";
@@ -37,13 +37,17 @@ export function ReportPostForm({
   postId: string;
   submitCallback?: () => void;
 }) {
-  const { reportPost,loadingReport } = useReportPost();
-  const { handleSubmit, control, formState, reset, watch } = useForm<
+  const { reportPost, loadingReport } = useReportPost();
+  const { handleSubmit, control, formState, reset,  } = useForm<
     z.infer<typeof formSchema>
   >({
     resolver: zodResolver(formSchema),
     defaultValues: { description: "", reason: "", postId },
     mode: "onChange",
+  });
+  const descriptionWatched = useWatch({
+    control,
+    name: "description",
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
@@ -60,7 +64,7 @@ export function ReportPostForm({
   }
 
   const maxLength = 500;
-  const progress = (watch("description").length / maxLength) * 100;
+  const progress = ((descriptionWatched.length || 0) / maxLength) * 100;
   return (
     <div className="">
       <div className="flex w-full box-border gap-2">
@@ -131,7 +135,7 @@ export function ReportPostForm({
                     htmlFor="form-rhf-demo-title"
                     className="text-white"
                   >
-                    {watch("description").length}/500
+                    {descriptionWatched.length || 0}/500
                   </FieldLabel>
                   <CircularProgress
                     size={30}

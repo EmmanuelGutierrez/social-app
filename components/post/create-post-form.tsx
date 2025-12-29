@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import z from "zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldLabel } from "../ui/field";
 import CircularProgress from "./circular-progress";
@@ -26,25 +26,27 @@ import { EMOJIS } from "@/common/constants/emojis";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 
-
 const formSchema = z.object({
   body: z.string().max(500, { error: "El maximo de caracteres es de 500" }),
   files: z.any().optional(),
   replyTo: z.string().optional(),
-
 });
 
 export function CreatePostForm({ replyTo }: { replyTo?: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { createPost } = usePost()
-  const { user } = useAuth()
-  const { handleSubmit, control, formState, setValue, getValues, reset, watch } =
+  const { createPost } = usePost();
+  const { user } = useAuth();
+
+  const { handleSubmit, control, formState, setValue, getValues, reset } =
     useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: { body: "", replyTo },
       mode: "onChange",
     });
 
+  const formWatched = useWatch({
+    control,
+  });
 
   async function onSubmit({ files, ...dataForm }: z.infer<typeof formSchema>) {
     try {
@@ -52,10 +54,9 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
       reset();
     } catch (e) {
       console.log("e", e);
-      toastCustom.error("Error", "Error al crear el post")
-    } 
+      toastCustom.error("Error", "Error al crear el post");
+    }
   }
-
 
   const addEmoji = (emoji: string) => {
     // setContent((prev) => prev + emoji);
@@ -63,23 +64,30 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
     setValue("body", currentBody + emoji);
   };
 
-  const handleCompressFiles = async (files: FileList | null, prevFiles: File[] | null) => {
-    if (!files) return
+  const handleCompressFiles = async (
+    files: FileList | null,
+    prevFiles: File[] | null
+  ) => {
+    if (!files) return;
 
-    const compressedFiles: File[] = [...(prevFiles || [])]
+    const compressedFiles: File[] = [...(prevFiles || [])];
 
-    if (!files || files.length === 0 || (files.length + (prevFiles?.length || 0)) > 4) {
-      toastCustom.error("Error", "Se han superado las 4 imágenes")
+    if (
+      !files ||
+      files.length === 0 ||
+      files.length + (prevFiles?.length || 0) > 4
+    ) {
+      toastCustom.error("Error", "Se han superado las 4 imágenes");
 
-      return compressedFiles
-    };
+      return compressedFiles;
+    }
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const validTypes = ["image/jpeg", "image/png", "image/webp"];
 
       if (!validTypes.includes(file.type)) {
-        toastCustom.error("Error", "Formato incorrecto")
+        toastCustom.error("Error", "Formato incorrecto");
 
         return compressedFiles;
       }
@@ -89,15 +97,13 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
           maxSizeMB: 2,
           maxWidthOrHeight: 1200,
         });
-        compressedFiles.push(compressedFile)
+        compressedFiles.push(compressedFile);
       } else {
-        compressedFiles.push(file)
+        compressedFiles.push(file);
       }
-
     }
-    return compressedFiles
-
-  }
+    return compressedFiles;
+  };
 
   // const clearImages = () => {
   //   setValue("files", [])
@@ -105,14 +111,20 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
   // }
 
   const maxLength = 500;
-  const progress = (watch("body").length / maxLength) * 100;
+  console.log(
+    "formWatched",
+    formWatched,
+    formWatched.body?.length || 0 / maxLength
+  );
+  const progress = ((formWatched.body?.length || 0) / maxLength) * 100;
   return (
     <div className="">
       <Card className=" w-full p-4 shadow-sm rounded-md bg-primary-darker border border-primary/20 ">
         <div className="flex w-full box-border gap-2">
           <div className="">
             <Avatar className="h-10 w-10">
-              <AvatarImage className="object-cover"
+              <AvatarImage
+                className="object-cover"
                 src={user?.profileImg?.secure_url || "/placeholder.svg"}
                 alt={user?.name}
                 width={48}
@@ -124,7 +136,6 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
           <div className="w-full min-w-0">
             <form className="" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-4">
-
                 {/* Text Area */}
                 <Controller
                   name="files"
@@ -140,43 +151,65 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className={`grid gap-1 mt-3 rounded-xl overflow-hidden ${field.value.length === 1 ? "grid-cols-1" : "grid-cols-2"
-                              }`}
+                            className={`grid gap-1 mt-3 rounded-xl overflow-hidden ${
+                              field.value.length === 1
+                                ? "grid-cols-1"
+                                : "grid-cols-2"
+                            }`}
                           >
-                            {field.value.map((file: File, i: number) => (
-                              i < 4 ? <motion.div
-                                key={i}
-                                className="relative aspect-video bg-muted rounded-lg overflow-hidden"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.8 }}
-                              >
-                                <Image src={URL.createObjectURL(file) || "/placeholder.svg"} fill alt="" className="w-full h-full object-cover" />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const newImages = field.value.filter((_: File, idx: number) => idx !== i)
-                                    field.onChange(newImages)
-                                  }}
-                                  className="absolute top-2 right-2 bg-background/80 hover:bg-background text-foreground rounded-full p-1.5 transition-colors"
+                            {field.value.map((file: File, i: number) =>
+                              i < 4 ? (
+                                <motion.div
+                                  key={i}
+                                  className="relative aspect-video bg-muted rounded-lg overflow-hidden"
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.8 }}
                                 >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </motion.div> : <></>
-                            ))}
+                                  <Image
+                                    src={
+                                      URL.createObjectURL(file) ||
+                                      "/placeholder.svg"
+                                    }
+                                    fill
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newImages = field.value.filter(
+                                        (_: File, idx: number) => idx !== i
+                                      );
+                                      field.onChange(newImages);
+                                    }}
+                                    className="absolute top-2 right-2 bg-background/80 hover:bg-background text-foreground rounded-full p-1.5 transition-colors"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </motion.div>
+                              ) : (
+                                <></>
+                              )
+                            )}
                           </motion.div>
                         )}
                       </AnimatePresence>
                       <input
                         ref={fileInputRef}
                         type="file"
-                        multiple={!watch("files") || watch("files")?.length < 3}
+                        multiple={
+                          !formWatched.files || formWatched.files?.length < 3
+                        }
                         accept="image/*"
                         onChange={async (e) => {
-                          const compressedFiles = await handleCompressFiles(e.target.files, field.value)
+                          const compressedFiles = await handleCompressFiles(
+                            e.target.files,
+                            field.value
+                          );
                           field.onChange(compressedFiles);
 
-                          e.target.value = ""
+                          e.target.value = "";
                         }}
                         className="hidden"
                       />
@@ -187,7 +220,6 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                   name="body"
                   control={control}
                   render={({ field, fieldState }) => {
-
                     return (
                       <Field
                         className="space-y-2 relative"
@@ -197,7 +229,6 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                           {...field}
                           id="body"
                           placeholder="¿Qué estas pensando?"
-
                           className="resize-none text-base bg-transparent border-0 
                     border-b border-transparent focus-visible:border-primary 
                     rounded-none focus-visible:ring-0 ring-offset-0
@@ -205,15 +236,12 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                     wrap-break-word 
                     "
                         />
-
-
                       </Field>
                     );
                   }}
                 />
                 <div className="flex items-center justify-between bg-transparent mb-0">
                   <div className="flex items-center gap-2">
-
                     <div className="my-auto">
                       <Button
                         type="button"
@@ -251,8 +279,6 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                         </div>
                       </PopoverContent>
                     </Popover>
-
-
                   </div>
 
                   {/* Post Button */}
@@ -261,7 +287,7 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                       htmlFor="form-rhf-demo-title"
                       className="text-white"
                     >
-                      {watch("body").length}/500
+                      {formWatched.body?.length || 0}/500
                     </FieldLabel>
                     <CircularProgress
                       size={30}
