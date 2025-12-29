@@ -1,18 +1,18 @@
 import { apolloClient } from "@/graphql/client";
 import {
-  FollowUserDocument,
-  UnfollowUserDocument,
+  UserFollowUserDocument,
+  UserUnfollowDocument,
 } from "@/graphql/types/graphql";
 import { useMutation } from "@apollo/client/react";
 
 export const useFollow = () => {
   const [fetchFollow, { loading: followLoading }] = useMutation(
-    FollowUserDocument,
+    UserFollowUserDocument,
     { client: apolloClient }
   );
 
   const [fetchUnfollow, { loading: unfollowLoading }] = useMutation(
-    UnfollowUserDocument,
+    UserUnfollowDocument,
     { client: apolloClient }
   );
   const followUser = async (userId: string) => {

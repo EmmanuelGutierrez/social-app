@@ -8,5 +8,5 @@ export function useUserByUsername(username: string) {
     variables: { username },
   });
 
-  return { userData: data?.userByUsername, userLoading: loading, userError: error };
+  return { userData: data?.UserByUsername, userLoading: loading, userError: error };
 }

@@ -201,7 +201,7 @@ export default function UserProfile({ username }: { username: string }) {
                     </TabsList>
 
                     <TabsContent value="posts" className="space-y-4 mt-6">
-                        <PostContainer postsData={userPosts?.userPosts} loadMore={loadMore} loading={userPostsLoading} />
+                        <PostContainer postsData={userPosts} loadMore={loadMore} loading={userPostsLoading} />
                     </TabsContent>
 
                     <TabsContent value="media" className="mt-6">
@@ -210,7 +210,7 @@ export default function UserProfile({ username }: { username: string }) {
 
                     <TabsContent value="likes" className="mt-6">
                         <p className="text-center text-muted-foreground py-8">Los posts que le gustan a {userData.user.name}</p>
-                        <PostContainer postsData={likedPosts?.likedPosts} loadMore={loadMoreLikedPosts} loading={likedPostsLoading} />
+                        <PostContainer postsData={likedPosts} loadMore={loadMoreLikedPosts} loading={likedPostsLoading} />
                     </TabsContent>
                 </Tabs>
             </div>

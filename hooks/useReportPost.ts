@@ -1,13 +1,13 @@
 import { apolloClient } from "@/graphql/client";
 import {
   CreatePostReportInput,
-  ReportPostDocument,
+  PostReportPostDocument,
 } from "@/graphql/types/graphql";
 import { useMutation } from "@apollo/client/react";
 
 export const useReportPost = () => {
   const [reportPostFetch, { data, loading, error }] = useMutation(
-    ReportPostDocument,
+    PostReportPostDocument,
     {
       client: apolloClient,
     }
@@ -15,7 +15,7 @@ export const useReportPost = () => {
 
   const reportPost = async (data: CreatePostReportInput) => {
     const res = await reportPostFetch({ variables: { data } });
-    return res.data?.reportPost;
+    return res.data?.PostReportPost;
   };
 
   return {

@@ -1,17 +1,17 @@
 import { apolloClient } from "@/graphql/client";
 import {
-  LikePostDocument,
-  DislikePostDocument,
-  GetPostAndAllCommentsDocument,
-  CreatePostMutationDocument,
+  PostLikePostDocument,
+  PostDislikePostDocument,
+  PostGetPostAndAllCommentsDocument,
+  PostCreatePostDocument,
   CreatePostInput,
-  CreatePostMutationMutation,
-  GetCommentsDocument,
-  GetCommentsQuery,
-  GetAncestorsCommentsDocument,
-  GetAncestorsCommentsQuery,
-  GetPostsByIdsDocument,
-  GetPostsByIdsQuery,
+  PostCreatePostMutation,
+  PostGetCommentsDocument,
+  PostGetCommentsQuery,
+  PostGetAncestorsCommentsDocument,
+  PostGetAncestorsCommentsQuery,
+  PostGetPostsByIdsDocument,
+  PostGetPostsByIdsQuery,
 } from "@/graphql/types/graphql";
 import { ApolloCache } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
@@ -21,7 +21,7 @@ import { ObjMap } from "graphql/jsutils/ObjMap";
 
 const updateFeed = (
   cache: ApolloCache,
-  newPost: FormattedExecutionResult<CreatePostMutationMutation, ObjMap<unknown>>
+  newPost: FormattedExecutionResult<PostCreatePostMutation, ObjMap<unknown>>
 ) => {
   cache.modify({
     fields: {
@@ -29,7 +29,7 @@ const updateFeed = (
         console.log("Post feed", existing);
         const newFeedPost = {
           iLiked: false,
-          post: newPost.data?.createPost,
+          post: newPost.data?.PostCreatePost,
           likesCount: 0,
           repliesCount: 0,
         };
@@ -47,14 +47,14 @@ const updateFeed = (
 
 const updateReplies = (
   cache: ApolloCache,
-  newPost: FormattedExecutionResult<CreatePostMutationMutation, ObjMap<unknown>>
+  newPost: FormattedExecutionResult<PostCreatePostMutation, ObjMap<unknown>>
 ) => {
   cache.modify({
     fields: {
       postAndAllComments: (existing, {}) => {
         const newRepliesPost = {
           iLiked: false,
-          post: newPost.data?.createPost,
+          post: newPost.data?.PostCreatePost,
           likeCount: 0,
           replyCount: 0,
         };
@@ -81,21 +81,21 @@ const updateReplies = (
 
 const mergeMoreReplies = (
   cache: ApolloCache,
-  newReplies: FormattedExecutionResult<GetCommentsQuery, ObjMap<unknown>>
+  newReplies: FormattedExecutionResult<PostGetCommentsQuery, ObjMap<unknown>>
 ) => {
   cache.modify({
     fields: {
       postAndAllComments: (existing, {}) => {
-        if (!newReplies.data?.getComments) {
+        if (!newReplies.data?.PostGetComments) {
           return existing;
         }
         return {
           ...existing,
           replies: {
-            ...newReplies.data.getComments,
+            ...newReplies.data.PostGetComments,
             data: [
               ...existing.replies.data,
-              ...newReplies.data.getComments.data,
+              ...newReplies.data.PostGetComments.data,
             ],
           },
         };
@@ -107,23 +107,23 @@ const mergeMoreReplies = (
 const mergeAncestorsComments = (
   cache: ApolloCache,
   newAncestorsComments: FormattedExecutionResult<
-    GetAncestorsCommentsQuery,
+    PostGetAncestorsCommentsQuery,
     ObjMap<unknown>
   >
 ) => {
   cache.modify({
     fields: {
       postAndAllComments: (existing, {}) => {
-        if (!newAncestorsComments.data?.getAncestorsComments) {
+        if (!newAncestorsComments.data?.PostGetAncestorsComments) {
           return existing;
         }
         return {
           ...existing,
           ancestorsComments: {
-            ...newAncestorsComments.data.getAncestorsComments,
+            ...newAncestorsComments.data.PostGetAncestorsComments,
             data: [
               ...existing.ancestorsComments.data,
-              ...newAncestorsComments.data.getAncestorsComments.data,
+              ...newAncestorsComments.data.PostGetAncestorsComments.data,
             ],
           },
         };
@@ -134,16 +134,16 @@ const mergeAncestorsComments = (
 
 const mergePostsByIds = (
   cache: ApolloCache,
-  newPosts: FormattedExecutionResult<GetPostsByIdsQuery, ObjMap<unknown>>
+  newPosts: FormattedExecutionResult<PostGetPostsByIdsQuery, ObjMap<unknown>>
 ) => {
   cache.modify({
     fields: {
       myFeed: (existing) => {
-        if (!newPosts.data?.getPostsByIds) {
+        if (!newPosts.data?.PostGetPostsByIds) {
           return existing;
         }
 
-        const data = [...newPosts.data?.getPostsByIds,...existing.data, ];
+        const data = [...newPosts.data?.PostGetPostsByIds, ...existing.data];
         const newFeedData = {
           ...existing,
           data,
@@ -156,21 +156,21 @@ const mergePostsByIds = (
 
 export const usePost = () => {
   // const { setIsLoading } = useApp();
-  const [likePostMutation, likePostData] = useMutation(LikePostDocument, {
+  const [likePostMutation, likePostData] = useMutation(PostLikePostDocument, {
     client: apolloClient,
   });
   const [dislikePostMutation, dislikePostData] = useMutation(
-    DislikePostDocument,
+    PostDislikePostDocument,
     {
       client: apolloClient,
     }
   );
   const [createPostMutation, { loading: createPostLoading }] = useMutation(
-    CreatePostMutationDocument,
+    PostCreatePostDocument,
     {
       client: apolloClient,
       update: (cache, res) => {
-        const newPost = res.data?.createPost;
+        const newPost = res.data?.PostCreatePost;
         if (newPost?.replyTo) {
           updateReplies(cache, res);
         } else {
@@ -182,26 +182,26 @@ export const usePost = () => {
   const [
     postAndCommentsFetch,
     { data: postAndAllCommentsData, loading: postAndAllCommentsLoading },
-  ] = useLazyQuery(GetPostAndAllCommentsDocument, {
+  ] = useLazyQuery(PostGetPostAndAllCommentsDocument, {
     client: apolloClient,
   });
 
   const [commentsFetch, { data: commentsData, loading: commentsLoading }] =
-    useLazyQuery(GetCommentsDocument, {
+    useLazyQuery(PostGetCommentsDocument, {
       client: apolloClient,
     });
 
   const [
     ancestorsCommentsFetch,
     { data: ancestorsCommentsData, loading: ancestorsCommentsLoading },
-  ] = useLazyQuery(GetAncestorsCommentsDocument, {
+  ] = useLazyQuery(PostGetAncestorsCommentsDocument, {
     client: apolloClient,
   });
 
   const [
     getPostsByIdsFetch,
     { data: getPostsByIdsData, loading: getPostsByIdsLoading },
-  ] = useLazyQuery(GetPostsByIdsDocument, { client: apolloClient });
+  ] = useLazyQuery(PostGetPostsByIdsDocument, { client: apolloClient });
 
   async function createPost(data: CreatePostInput, files?: FileList) {
     const res = await createPostMutation({
@@ -275,7 +275,7 @@ export const usePost = () => {
     createPost,
     createPostLoading,
     getPostAndAllComments,
-    postAndAllComments: postAndAllCommentsData?.postAndAllComments,
+    postAndAllComments: postAndAllCommentsData?.PostGetPostAndAllComments,
     postAndAllCommentsLoading,
     getComments,
     commentsData,

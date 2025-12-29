@@ -1,0 +1,3 @@
+query PostGetLikesCount($postId: String!) {
+  PostGetLikesCount(postId: $postId)
+}

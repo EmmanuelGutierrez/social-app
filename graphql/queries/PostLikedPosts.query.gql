@@ -1,5 +1,5 @@
-query UserPosts($params: FilterInput!) {
-  userPosts(params: $params) {
+query PostLikedPosts($params: FilterInput!) {
+  PostLikedPosts(params: $params) {
     hasMore
     nextCursor
     data {

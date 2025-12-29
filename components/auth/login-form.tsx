@@ -37,7 +37,7 @@ export function LoginForm() {
     try {
       // setLoading(true);
       const res=await login(dataForm);
-      if(!res.data?.login.tokenWs){
+      if(!res.data?.AuthLogin.tokenWs){
        throw new Error("Error al iniciar sesión") 
       }
       toast.success("You submitted the following values:", {

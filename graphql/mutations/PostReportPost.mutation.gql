@@ -1,0 +1,3 @@
+mutation PostReportPost($data: CreatePostReportInput!) {
+  PostReportPost(data: $data)
+}

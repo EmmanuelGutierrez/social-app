@@ -1,5 +1,5 @@
-query GetPostsByIds($postsIds: [String!]!) {
-  getPostsByIds(postsIds: $postsIds) {
+query PostGetPostsByIds($postsIds: [String!]!) {
+  PostGetPostsByIds(postsIds: $postsIds) {
     iLiked
     likeCount
     replyCount

@@ -1,5 +1,5 @@
 import { apolloClient } from "@/graphql/client";
-import { GetLikesCountDocument } from "@/graphql/types/graphql";
+import { PostGetLikesCountDocument } from "@/graphql/types/graphql";
 import { useQuery } from "@apollo/client/react";
 
 export function useLikesCount(postId: string) {
@@ -7,7 +7,7 @@ export function useLikesCount(postId: string) {
     data: likesCountData,
     loading: likesCountLoading,
     refetch,
-  } = useQuery(GetLikesCountDocument, {
+  } = useQuery(PostGetLikesCountDocument, {
     client: apolloClient,
     variables: {
       postId,

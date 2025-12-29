@@ -1,3 +1,0 @@
-query GetLikesCount($postId: String!) {
-  getLikesCount(postId: $postId)
-}

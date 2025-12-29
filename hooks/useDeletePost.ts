@@ -1,10 +1,10 @@
 import { apolloClient } from "@/graphql/client";
-import { DeletePostUserDocument, } from "@/graphql/types/graphql";
+import { PostDeletePostUserDocument, } from "@/graphql/types/graphql";
 import { useMutation } from "@apollo/client/react";
 
 export const useDeletePost = () => {
   const [deletePostUser, { loading, data }] = useMutation(
-    DeletePostUserDocument,
+    PostDeletePostUserDocument,
     { client: apolloClient }
   );
 
@@ -19,7 +19,7 @@ export const useDeletePost = () => {
             id: postRef,
             fields: {
               status() {
-                return res.data?.deletePostUser.status;
+                return res.data?.PostDeletePostUser.status;
               },
             },
           });

@@ -1,5 +1,5 @@
 import { apolloClient } from "@/graphql/client";
-import { LikedPostsDocument } from "@/graphql/types/graphql";
+import { PostLikedPostsDocument } from "@/graphql/types/graphql";
 import { useQuery } from "@apollo/client/react";
 
 export function useLikedPosts(username: string) {
@@ -8,7 +8,7 @@ export function useLikedPosts(username: string) {
     loading: likedPostsLoading,
     error: likedPostsError,
     fetchMore,
-  } = useQuery(LikedPostsDocument, {
+  } = useQuery(PostLikedPostsDocument, {
     client: apolloClient,
     variables: {
       params: {
@@ -21,7 +21,7 @@ export function useLikedPosts(username: string) {
     nextFetchPolicy: "cache-first",
   });
   const loadMoreLikedPosts = () => {
-    if (!likedPosts?.likedPosts.hasMore) {
+    if (!likedPosts?.PostLikedPosts.hasMore) {
       return;
     }
 
@@ -29,14 +29,14 @@ export function useLikedPosts(username: string) {
       variables: {
         params: {
           limit: 10,
-          cursorDate: likedPosts.likedPosts.nextCursor,
+          cursorDate: likedPosts.PostLikedPosts.nextCursor,
           // tags,
         },
       },
     });
   };
   return {
-    likedPosts,
+    likedPosts: likedPosts?.PostLikedPosts,
     likedPostsLoading,
     likedPostsError,
     loadMoreLikedPosts,

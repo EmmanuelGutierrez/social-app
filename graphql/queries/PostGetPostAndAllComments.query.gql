@@ -1,5 +1,5 @@
-query GetPostAndAllComments($postId: String!) {
-  postAndAllComments(postId: $postId) {
+query PostGetPostAndAllComments($postId: String!) {
+  PostGetPostAndAllComments(postId: $postId) {
     replies {
       hasMore
       nextCursor

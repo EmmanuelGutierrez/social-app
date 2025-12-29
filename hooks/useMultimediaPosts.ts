@@ -1,5 +1,5 @@
 import { apolloClient } from "@/graphql/client";
-import { MultimediaPostDocument } from "@/graphql/types/graphql";
+import { PostMultimediaPostDocument } from "@/graphql/types/graphql";
 import { useQuery } from "@apollo/client/react";
 
 export function useMultimediaPosts(username: string) {
@@ -8,7 +8,7 @@ export function useMultimediaPosts(username: string) {
     loading: multimediaPostsLoading,
     error: multimediaPostsError,
     fetchMore,
-  } = useQuery(MultimediaPostDocument, {
+  } = useQuery(PostMultimediaPostDocument, {
     client: apolloClient,
     variables: {
       params: {
@@ -22,7 +22,7 @@ export function useMultimediaPosts(username: string) {
     nextFetchPolicy: "cache-first",
   });
   const loadMoreMultimediaPosts = () => {
-    if (!multimediaPosts?.userPosts.hasMore) {
+    if (!multimediaPosts?.PostUserPosts.hasMore) {
       return;
     }
 
@@ -30,14 +30,14 @@ export function useMultimediaPosts(username: string) {
       variables: {
         params: {
           limit: 10,
-          cursorDate: multimediaPosts.userPosts.nextCursor,
+          cursorDate: multimediaPosts.PostUserPosts.nextCursor,
           // tags,
         },
       },
     });
   };
   return {
-    multimediaPosts,
+    multimediaPosts: multimediaPosts?.PostUserPosts,
     multimediaPostsLoading,
     multimediaPostsError,
     loadMoreMultimediaPosts,

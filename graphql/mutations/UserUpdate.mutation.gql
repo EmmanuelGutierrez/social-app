@@ -1,9 +1,9 @@
-mutation UpdateUser(
+mutation UserUpdate(
   $updateUserInput: UpdateUserInput!
   $bannerImg: Upload
   $profileImg: Upload
 ) {
-  updateUser(
+  UserUpdate(
     updateUserInput: $updateUserInput
     bannerImg: $bannerImg
     profileImg: $profileImg

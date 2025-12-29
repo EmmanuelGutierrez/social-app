@@ -1,18 +1,18 @@
 import { apolloClient } from "@/graphql/client";
-import { UpdateUserDocument, UpdateUserInput } from "@/graphql/types/graphql";
+import { UserUpdateDocument, UpdateUserInput } from "@/graphql/types/graphql";
 import { useAuth } from "./useAuth";
 import { useMutation } from "@apollo/client/react";
 
 export const useUpdateUser = () => {
   const { setUser, user } = useAuth();
-  const [updateUserMutation, updateUserData] = useMutation(UpdateUserDocument, {
+  const [updateUserMutation, updateUserData] = useMutation(UserUpdateDocument, {
     client: apolloClient,
     fetchPolicy: "network-only",
     onCompleted: async (data) => {
-      if (data?.updateUser) {
+      if (data?.UserUpdate) {
         //    const meRes = await meQuery();
         const userData = {
-          ...data?.updateUser,
+          ...data?.UserUpdate,
           followers: user?.followers,
           following: user?.following,
         };

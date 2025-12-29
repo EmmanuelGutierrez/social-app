@@ -1,5 +1,5 @@
-query MultimediaPost($params: FilterInput!) {
-  userPosts(params: $params) {
+query PostMultimediaPost($params: FilterInput!) {
+  PostUserPosts(params: $params) {
     hasMore
     nextCursor
     data {

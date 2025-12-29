@@ -1,0 +1,6 @@
+mutation PostLikePost($likePostId: String!) {
+  PostLikePost(id: $likePostId) {
+    ignored
+    likedCount
+  }
+}

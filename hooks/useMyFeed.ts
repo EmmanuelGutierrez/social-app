@@ -1,5 +1,5 @@
 import { apolloClient } from "@/graphql/client";
-import { MyFeedDocument, MyFeedQuery } from "@/graphql/types/graphql";
+import { PostMyFeedDocument, PostMyFeedQuery } from "@/graphql/types/graphql";
 import { useQuery } from "@apollo/client/react";
 
 export function useMyFeed() {
@@ -8,7 +8,7 @@ export function useMyFeed() {
     loading,
     error,
     fetchMore,
-  } = useQuery<MyFeedQuery>(MyFeedDocument, {
+  } = useQuery<PostMyFeedQuery>(PostMyFeedDocument, {
     client: apolloClient,
     variables: {
       params: {
@@ -21,7 +21,7 @@ export function useMyFeed() {
     nextFetchPolicy: "cache-first",
   });
   const loadMore = () => {
-    if (!myFeed?.myFeed.hasMore) {
+    if (!myFeed?.PostMyFeed.hasMore) {
       return;
     }
 
@@ -29,36 +29,36 @@ export function useMyFeed() {
       variables: {
         params: {
           limit: 5,
-          cursorDate: myFeed.myFeed.nextCursor,
+          cursorDate: myFeed.PostMyFeed.nextCursor,
           // tags,
         },
       },
       updateQuery(previousQueryResult, options) {
-        const { fetchMoreResult, } = options;
+        const { fetchMoreResult } = options;
         if (!fetchMoreResult) {
           return previousQueryResult;
         }
-        const existingIds = previousQueryResult.myFeed.data.map(
+        const existingIds = previousQueryResult.PostMyFeed.data.map(
           (post) => post.post._id
         );
 
         const data = [
-          ...previousQueryResult.myFeed.data,
-          ...fetchMoreResult.myFeed.data.filter(
+          ...previousQueryResult.PostMyFeed.data,
+          ...fetchMoreResult.PostMyFeed.data.filter(
             (p) => !existingIds.includes(p.post._id)
           ),
         ];
         return {
           ...previousQueryResult,
-          myFeed: {
-            ...previousQueryResult.myFeed,
+          PostMyFeed: {
+            ...previousQueryResult.PostMyFeed,
             data,
-            nextCursor: fetchMoreResult.myFeed.nextCursor,
-            hasMore: fetchMoreResult.myFeed.hasMore,
+            nextCursor: fetchMoreResult.PostMyFeed.nextCursor,
+            hasMore: fetchMoreResult.PostMyFeed.hasMore,
           },
         };
       },
     });
   };
-  return { myFeed, loading, error, loadMore };
+  return { myFeed: myFeed?.PostMyFeed, loading, error, loadMore };
 }

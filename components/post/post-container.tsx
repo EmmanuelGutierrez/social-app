@@ -3,7 +3,7 @@ import PostDisplay from "./post-display";
 import { useEffect, useRef } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
-import { MyFeedQuery } from "@/graphql/types/graphql";
+import { PostMyFeedQuery } from "@/graphql/types/graphql";
 import { ErrorLike } from "@apollo/client";
 
 export const PostContainer = ({
@@ -14,7 +14,7 @@ export const PostContainer = ({
 }: {
   loadMore: () => void;
   loading: boolean;
-  postsData?: MyFeedQuery["myFeed"];
+  postsData?: PostMyFeedQuery["PostMyFeed"];
   error?: ErrorLike;
 }) => {
   const loaderRef = useRef<HTMLDivElement>(null);

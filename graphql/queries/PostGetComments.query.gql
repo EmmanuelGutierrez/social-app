@@ -1,5 +1,5 @@
-query GetAncestorsComments($postId: String!) {
-  getAncestorsComments(postId: $postId) {
+query PostGetComments($postId: String!, $cursor: String) {
+  PostGetComments(postId: $postId, cursor: $cursor) {
     nextCursor
     hasMore
     data {

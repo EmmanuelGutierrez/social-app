@@ -6,6 +6,6 @@ export const MyFeedContainer = () => {
     const { myFeed, loadMore, loading, error } = useMyFeed()
 
     return (
-        <PostContainer postsData={myFeed?.myFeed} loadMore={loadMore} loading={loading} error={error} />
+        <PostContainer postsData={myFeed} loadMore={loadMore} loading={loading} error={error} />
     )
 }

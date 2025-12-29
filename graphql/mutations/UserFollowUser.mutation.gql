@@ -1,0 +1,3 @@
+mutation UserFollowUser($userToFollowId: String!) {
+  UserFollowUser(userToFollowId: $userToFollowId)
+}

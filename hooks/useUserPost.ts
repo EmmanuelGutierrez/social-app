@@ -1,5 +1,5 @@
 import { apolloClient } from "@/graphql/client";
-import { UserPostsDocument } from "@/graphql/types/graphql";
+import { PostUserPostsDocument } from "@/graphql/types/graphql";
 import { useQuery } from "@apollo/client/react";
 
 export function useUserPosts(username: string) {
@@ -8,7 +8,7 @@ export function useUserPosts(username: string) {
     loading: userPostsLoading,
     error: userPostsError,
     fetchMore,
-  } = useQuery(UserPostsDocument, {
+  } = useQuery(PostUserPostsDocument, {
     client: apolloClient,
     variables: {
       params: {
@@ -21,8 +21,8 @@ export function useUserPosts(username: string) {
     nextFetchPolicy: "cache-first",
   });
   const loadMore = () => {
-    console.log(userPosts?.userPosts.hasMore);
-    if (!userPosts?.userPosts.hasMore) {
+    console.log(userPosts?.PostUserPosts.hasMore);
+    if (!userPosts?.PostUserPosts.hasMore) {
       return;
     }
 
@@ -30,7 +30,7 @@ export function useUserPosts(username: string) {
       variables: {
         params: {
           limit: 5,
-          cursorDate: userPosts.userPosts.nextCursor,
+          cursorDate: userPosts.PostUserPosts.nextCursor,
           username,
           // tags,
         },
@@ -40,27 +40,27 @@ export function useUserPosts(username: string) {
         if (!fetchMoreResult) {
           return previousQueryResult;
         }
-        const existingIds = previousQueryResult.userPosts.data.map(
+        const existingIds = previousQueryResult.PostUserPosts.data.map(
           (post) => post.post._id
         );
 
         const data = [
-          ...previousQueryResult.userPosts.data,
-          ...fetchMoreResult.userPosts.data.filter(
+          ...previousQueryResult.PostUserPosts.data,
+          ...fetchMoreResult.PostUserPosts.data.filter(
             (p) => !existingIds.includes(p.post._id)
           ),
         ];
         return {
           ...previousQueryResult,
-          userPosts: {
-            ...previousQueryResult.userPosts,
+          PostUserPosts: {
+            ...previousQueryResult.PostUserPosts,
             data,
-            nextCursor: fetchMoreResult.userPosts.nextCursor,
-            hasMore: fetchMoreResult.userPosts.hasMore,
+            nextCursor: fetchMoreResult.PostUserPosts.nextCursor,
+            hasMore: fetchMoreResult.PostUserPosts.hasMore,
           },
         };
       },
     });
   };
-  return { userPosts, userPostsLoading, userPostsError, loadMore };
+  return { userPosts:userPosts?.PostUserPosts, userPostsLoading, userPostsError, loadMore };
 }

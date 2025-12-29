@@ -24,7 +24,7 @@ import { usePost } from "@/hooks/usePost";
 import { useRefetch } from "@/hooks/useRefetch";
 import { SlidingCounter } from "../common/SlidingCounter";
 import {
-  MyFeedQuery,
+  PostMyFeedQuery,
   PostFragmentFragmentDoc,
   PostStatus,
 } from "@/graphql/types/graphql";
@@ -47,7 +47,7 @@ import {
 } from "../ui/alert-dialog";
 
 interface PostDisplayProps {
-  postData: MyFeedQuery["myFeed"]["data"][number];
+  postData: PostMyFeedQuery["PostMyFeed"]["data"][number];
   variant?: "default" | "compact";
 }
 
@@ -66,7 +66,7 @@ export default function PostDisplay({
   const [userReaction, setUserReaction] = useState<boolean>(iLiked);
   const { likesCountData, refetch } = useLikesCount(postRaw._id);
   const [likeCount, setLikeCount] = useState<number>(
-    likesCountData?.getLikesCount || 0
+    likesCountData?.PostGetLikesCount || 0
   );
   const ref = useRefetch({ refetch });
 
@@ -81,7 +81,7 @@ export default function PostDisplay({
 
   useEffect(() => {
     if (likesCountData) {
-      updateLikeCount(likesCountData.getLikesCount);
+      updateLikeCount(likesCountData.PostGetLikesCount);
     }
   }, [likesCountData]);
 
@@ -90,13 +90,13 @@ export default function PostDisplay({
     if (!dislikePostLoading && !likePostLoading) {
       if (!userReaction) {
         const res = await likePost(postRaw._id);
-        if (res.data && !res.data?.likePost.ignored) {
+        if (res.data && !res.data?.PostLikePost.ignored) {
           setUserReaction(true);
           setLikeCount((prev) => prev + 1);
         }
       } else {
         const res = await dislikePost(postRaw._id);
-        if (res.data && !res.data?.dislikePost.ignored) {
+        if (res.data && !res.data?.PostDislikePost.ignored) {
           setUserReaction(false);
           setLikeCount((prev) => prev - 1);
         }

@@ -1,5 +1,5 @@
-query RandomSuggestedUsers {
-  suggestedUsers {
+query UserSuggestedUsers {
+  UserSuggestedUsers {
     _id
     name
     lastname

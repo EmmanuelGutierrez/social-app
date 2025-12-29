@@ -1,5 +1,0 @@
-mutation registerMutation($file: Upload, $register: CreateUserInput!) {
-  register(file: $file, register: $register) {
-    tokenWs
-  }
-}

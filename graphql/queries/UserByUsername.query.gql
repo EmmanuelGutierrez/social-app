@@ -1,5 +1,5 @@
 query UserByUsername($username: String!) {
-  userByUsername(username: $username) {
+  UserByUsername(username: $username) {
     user {
       _id
       createdAt

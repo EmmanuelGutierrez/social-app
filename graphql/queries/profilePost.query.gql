@@ -3,7 +3,7 @@ query ProfilePosts(
   $likedPostsParams: FilterInput!
   $userPostsParams: FilterInput!
 ) {
-  multimediaPosts: userPosts(params: $multimediaPostParams) {
+  multimediaPosts: PostUserPosts(params: $multimediaPostParams) {
     hasMore
     nextCursor
     data {
@@ -17,7 +17,7 @@ query ProfilePosts(
       }
     }
   }
-  likedPosts(params: $likedPostsParams) {
+  PostLikedPosts(params: $likedPostsParams) {
     hasMore
     nextCursor
     data {
@@ -30,7 +30,7 @@ query ProfilePosts(
       }
     }
   }
-  userPosts(params: $userPostsParams) {
+  PostUserPosts(params: $userPostsParams) {
     hasMore
     nextCursor
     data {

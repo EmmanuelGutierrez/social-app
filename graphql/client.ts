@@ -1,8 +1,8 @@
 import { InMemoryCache, Observable } from "@apollo/client";
 import { ApolloClient } from "@apollo/client";
 import {
-  LogoutMutationDocument,
-  RotateAccessTokenDocument,
+  AuthLogoutDocument,
+  AuthRotateAccessTokenDocument,
 } from "./types/graphql";
 import { ErrorLink } from "@apollo/client/link/error";
 import { ApolloLink } from "@apollo/client";
@@ -60,25 +60,25 @@ export const apolloClientPlain = new ApolloClient({
 async function refreshAccessToken() {
   try {
     const { data, error } = await apolloClientPlain.mutate({
-      mutation: RotateAccessTokenDocument,
+      mutation: AuthRotateAccessTokenDocument,
       fetchPolicy: "no-cache",
     });
     console.log("DATA AND ERROR", data, error);
-    if (data?.rotateAccessToken) {
-      localStorage.setItem("tokenWs", data?.rotateAccessToken.tokenWs);
+    if (data?.AuthRotateAccessToken) {
+      localStorage.setItem("tokenWs", data?.AuthRotateAccessToken.tokenWs);
       // wsLink.client.dispose();
       // wsLink.client.
       return true;
     }
     await apolloClientPlain.mutate({
-      mutation: LogoutMutationDocument,
+      mutation: AuthLogoutDocument,
     });
     return false;
   } catch (error) {
     console.log("ERROR");
     sessionStorage.clear();
     await apolloClientPlain.mutate({
-      mutation: LogoutMutationDocument,
+      mutation: AuthLogoutDocument,
     });
     console.log("ERROR", error);
     return false;

@@ -1,5 +1,0 @@
-mutation LoginMutation($loginInput: LoginInput!) {
-  login(loginInput: $loginInput) {
-    tokenWs
-  }
-}

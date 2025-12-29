@@ -1,0 +1,5 @@
+mutation AuthRegister($file: Upload, $register: CreateUserInput!) {
+  AuthRegister(file: $file, register: $register) {
+    tokenWs
+  }
+}
