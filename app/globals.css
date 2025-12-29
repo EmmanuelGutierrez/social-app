@@ -4,7 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-
   --width-100: 25rem;
   --width-110: 27.5rem;
   --width-120: 30rem;
@@ -135,19 +134,27 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* ===== Base Theme (Dark) =====  */
-  --background: oklch(0.13 0.03 228.1);
+  --background: oklch(0 0 none);
   --surface: oklch(18% 0.035 250);
   --text: oklch(0.984 0.003 247.858);
   --color-white: oklch(0.984 0.003 247.858);
   --text-secondary: oklch(70% 0.03 250);
   --border: oklch(25% 0.02 250);
 
-  /* / ===== Primary (blue shades) ===== / */
-  --color-primary-lighter: oklch(78% 0.18 255);
-  --color-primary-light: oklch(70% 0.19 255);
-  --color-primary: oklch(60% 0.18 255);
-  --color-primary-dark: oklch(45% 0.17 255);
-  --color-primary-darker: oklch(18% 0.05 251);
+  /* / ===== Primary (blue shades) ===== / */ 
+  --color-primary-lighter: oklch(
+    0.7828347539718905 0.12482380257769636 238.61848240878086
+  );
+  --color-primary-light: oklch(
+    0.6903669951581527 0.14608135599575756 234.8165179408963
+  );
+  --color-primary: oklch(
+    0.6044616966611966 0.1286416729841985 235.23159108464665
+  );
+  --color-primary-dark: oklch(
+    0.44468248521432335 0.09416337709311694 234.8696184481667
+  );
+  --color-primary-darker: oklch(0.16518893834361387 0.01587125590244221 248.68837963929923);
 
   /* / ===== Secondary (violet-blue shades) ===== / */
   --color-secondary-lighter: oklch(80% 0.17 300);
@@ -161,11 +168,9 @@
   --color-error: oklch(65% 0.18 30);
   --color-warning: oklch(75% 0.16 80);
   --color-info: oklch(70% 0.14 230);
-
 }
 
 :root {
-  
   /* / Ejemplo de tema oscuro alternativo  */
   /* [data-theme="dark"] {
     --background: oklch(10% 0.03 250);
@@ -176,7 +181,7 @@
 
   --radius: 0.625rem;
   /* --background: oklch(1 0 0); */
-  --foreground:oklch(0.984 0.003 247.858);
+  --foreground: oklch(0.984 0.003 247.858);
   --card: var(--color-primary-darker);
   --card-foreground: var(--text);
   --popover: var(--color-primary-darker);
@@ -190,7 +195,7 @@
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.929 0.013 255.508);
+  --border: var(--color-primary-dark);
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.704 0.04 256.788);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -209,7 +214,7 @@
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
+  --background: oklch(0 0 none);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
   --card-foreground: oklch(0.984 0.003 247.858);

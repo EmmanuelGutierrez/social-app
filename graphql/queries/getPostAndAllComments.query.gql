@@ -9,34 +9,7 @@ query GetPostAndAllComments($postId: String!) {
         replyCount
         post {
           _id
-          reactionsCount
-          replyTo {
-            _id
-            authorId {
-              _id
-              username
-            }
-          }
-          authorId {
-            _id
-            username
-            name
-            lastname
-            profileImg {
-              _id
-              secure_url
-              public_id
-            }
-          }
-          body
-          createdAt
-          images {
-            _id
-            public_id
-            secure_url
-          }
-          tags
-          title
+          ...PostFragment
         }
       }
     }
@@ -46,27 +19,7 @@ query GetPostAndAllComments($postId: String!) {
       replyCount
       post {
         _id
-        reactionsCount
-        authorId {
-          _id
-          username
-          name
-          lastname
-          profileImg {
-            _id
-            secure_url
-            public_id
-          }
-        }
-        body
-        createdAt
-        images {
-          _id
-          public_id
-          secure_url
-        }
-        tags
-        title
+        ...PostFragment
       }
     }
 
@@ -79,34 +32,7 @@ query GetPostAndAllComments($postId: String!) {
         replyCount
         post {
           _id
-          reactionsCount
-          authorId {
-            _id
-            username
-            name
-            lastname
-            profileImg {
-              _id
-              secure_url
-              public_id
-            }
-          }
-          body
-          createdAt
-          images {
-            _id
-            public_id
-            secure_url
-          }
-          tags
-          title
-          replyTo {
-          _id
-          authorId {
-            username
-            _id
-          }
-        }
+          ...PostFragment
         }
       }
     }

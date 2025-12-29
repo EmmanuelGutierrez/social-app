@@ -16,6 +16,7 @@ export function useMyFeed() {
         cursorDate: null,
       },
     },
+
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
@@ -31,6 +32,31 @@ export function useMyFeed() {
           cursorDate: myFeed.myFeed.nextCursor,
           // tags,
         },
+      },
+      updateQuery(previousQueryResult, options) {
+        const { fetchMoreResult, } = options;
+        if (!fetchMoreResult) {
+          return previousQueryResult;
+        }
+        const existingIds = previousQueryResult.myFeed.data.map(
+          (post) => post.post._id
+        );
+
+        const data = [
+          ...previousQueryResult.myFeed.data,
+          ...fetchMoreResult.myFeed.data.filter(
+            (p) => !existingIds.includes(p.post._id)
+          ),
+        ];
+        return {
+          ...previousQueryResult,
+          myFeed: {
+            ...previousQueryResult.myFeed,
+            data,
+            nextCursor: fetchMoreResult.myFeed.nextCursor,
+            hasMore: fetchMoreResult.myFeed.hasMore,
+          },
+        };
       },
     });
   };

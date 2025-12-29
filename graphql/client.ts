@@ -144,53 +144,44 @@ export const apolloClient = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
-        fields: {
-          myFeed: {
-            keyArgs: false,
-            merge(
-              existing: {
-                data: { post: { __ref?: string; _id?: string } }[];
-                nextCursor?: string | null;
-                hasMore: boolean;
-              } = {
-                data: [],
-                nextCursor: null,
-                hasMore: false,
-              },
-              incoming: {
-                data: { post: { __ref?: string; _id?: string } }[];
-                nextCursor?: string | null;
-                hasMore: boolean;
-              }
-            ) {
-              console.log("MERGE", incoming, existing);
-              const existingIds = existing.data.map(
-                (post) => post.post.__ref || `Post:${post.post._id}`
-              );
+        // fields: {
+        //   myFeed: {
+        //     keyArgs: false,
+        //     merge(
+        //       existing: {
+        //         data: { post: { __ref?: string; _id?: string } }[];
+        //         nextCursor?: string | null;
+        //         hasMore: boolean;
+        //       } = {
+        //         data: [],
+        //         nextCursor: null,
+        //         hasMore: false,
+        //       },
+        //       incoming: {
+        //         data: { post: { __ref?: string; _id?: string } }[];
+        //         nextCursor?: string | null;
+        //         hasMore: boolean;
+        //       }
+        //     ) {
+        //       const existingIds = existing.data.map(
+        //         (post) => post.post.__ref || `Post:${post.post._id}`
+        //       );
 
-              const data = [
-                ...existing.data,
-                ...incoming.data.filter(
-                  (p) =>
-                    !existingIds.includes(p.post.__ref || `Post:${p.post._id}`)
-                ),
-              ];
-              console.log("Data", data);
-
-              const newFeedData = {
-                ...incoming,
-                data,
-              };
-              console.log(
-                "NEW DATA",
-                existing.data,
-                incoming.data,
-                newFeedData
-              );
-              return newFeedData;
-            },
-          },
-        },
+        //       const data = [
+        //         ...existing.data,
+        //         ...incoming.data.filter(
+        //           (p) =>
+        //             !existingIds.includes(p.post.__ref || `Post:${p.post._id}`)
+        //         ),
+        //       ];
+        //       const newFeedData = {
+        //         ...incoming,
+        //         data,
+        //       };
+        //       return newFeedData;
+        //     },
+        //   },
+        // },
       },
     },
   }),

@@ -12,6 +12,7 @@ fragment PostFragment on Post {
     }
   }
   body
+  status
   createdAt
   images {
     _id

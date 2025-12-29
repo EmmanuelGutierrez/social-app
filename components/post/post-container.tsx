@@ -1,41 +1,66 @@
 "use client";
 import PostDisplay from "./post-display";
 import { useEffect, useRef } from "react";
-import { Loader2 } from "lucide-react";
-import { motion } from "motion/react"
+import { AlertCircle, Loader2 } from "lucide-react";
+import { motion } from "motion/react";
 import { MyFeedQuery } from "@/graphql/types/graphql";
+import { ErrorLike } from "@apollo/client";
 
-export const PostContainer = ({ postsData, loadMore, loading }: { loadMore: () => void, loading: boolean, postsData?: MyFeedQuery['myFeed'] }) => {
-  const loaderRef = useRef<HTMLDivElement>(null)
+export const PostContainer = ({
+  postsData,
+  loadMore,
+  loading,
+  error,
+}: {
+  loadMore: () => void;
+  loading: boolean;
+  postsData?: MyFeedQuery["myFeed"];
+  error?: ErrorLike;
+}) => {
+  const loaderRef = useRef<HTMLDivElement>(null);
   // const { postsData, loadMore, loading } = useMyFeed();
 
   useEffect(() => {
-    const element = loaderRef.current
+    const element = loaderRef.current;
     if (!element) {
-      return
+      return;
     }
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        loadMore()
+      if (entries[0].isIntersecting && postsData?.hasMore) {
+        loadMore();
       }
-    })
-    observer.observe(element)
+    });
+    observer.observe(element);
     return () => {
-      observer.unobserve(element)
-    }
-  }, [loadMore, postsData?.nextCursor])
+      observer.unobserve(element);
+    };
+  }, [loadMore, postsData?.hasMore]);
+
+  if (error) {
+    return (
+      <div className="flex justify-center py-8">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <span>Error al cargar los posts</span>
+          <AlertCircle className="h-6 w-6 text-red-500" />
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       {postsData ? (
-        postsData?.data.map((postData,) => {
+        postsData?.data.map((postData) => {
           return (
-            <motion.div key={postData.post._id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 0.95 }} transition={{ duration: 0.4, delay: 1.5 }}>
+            <motion.div
+              key={postData.post._id}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 0.95 }}
+              transition={{ duration: 0.4, delay: 1.5 }}
+            >
               <div key={postData.post._id}>
-                <PostDisplay
-                  key={postData.post._id}
-                  postData={postData}
-                />
+                <PostDisplay key={postData.post._id} postData={postData} />
               </div>
             </motion.div>
           );
@@ -51,9 +76,12 @@ export const PostContainer = ({ postsData, loadMore, loading }: { loadMore: () =
           </div>
         )}
 
-        {
-          !loading && (!postsData || !postsData?.hasMore && postsData?.data.length > 0) && (
-            <div className="text-center text-muted-foreground">No hay más posts para mostrar</div>
+        {!loading &&
+          (!postsData ||
+            (!postsData?.hasMore && postsData?.data.length > 0)) && (
+            <div className="text-center text-muted-foreground">
+              No hay más posts para mostrar
+            </div>
           )}
       </div>
     </>

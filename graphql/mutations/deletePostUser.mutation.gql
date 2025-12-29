@@ -1,0 +1,6 @@
+mutation DeletePostUser($deletePostUserId: String!) {
+  deletePostUser(id: $deletePostUserId) {
+    _id
+    status
+  }
+}

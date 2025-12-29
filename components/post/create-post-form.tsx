@@ -31,27 +31,13 @@ const formSchema = z.object({
   body: z.string().max(500, { error: "El maximo de caracteres es de 500" }),
   files: z.any().optional(),
   replyTo: z.string().optional(),
-  // files: z.array(z.instanceof(File)).nullable().optional(),
-  // files: z.file({ error: "Error al subir el archivo" })
-  // .refine((files) => {
-  //   console.log("FILES", files);
-  //   return !files || files.size <= 2 * 1024 * 1024;
-  // }, "La imagen debe pesar menos de 2 MB")
-  // .refine(
-  //   (files) =>
-  //     !files ||
-  //     ["image/jpeg", "image/png", "image/webp"].includes(files.type),
-  //   "Formato incorrecto"
-  // ),
+
 });
 
 export function CreatePostForm({ replyTo }: { replyTo?: string }) {
-  // const [images, setImages] = useState<string[]>([]);
-  // const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { createPost } = usePost()
   const { user } = useAuth()
-  // const [loading, setLoading] = useState(false);
   const { handleSubmit, control, formState, setValue, getValues, reset, watch } =
     useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
