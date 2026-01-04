@@ -5,5 +5,5 @@ import { useQuery } from "@apollo/client/react"
 export const useSuggestedUsers = () => {
     const { data: suggestedUsers, loading: suggestedUsersLoading, error: suggestedUsersError } =
         useQuery(UserSuggestedUsersDocument, { client: apolloClient, fetchPolicy: "cache-first" })
-    return { suggestedUsers, suggestedUsersLoading, suggestedUsersError }
+    return { suggestedUsers: suggestedUsers?.UserSuggestedUsers, suggestedUsersLoading, suggestedUsersError }
 }

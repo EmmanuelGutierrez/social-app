@@ -1,16 +1,16 @@
 // import { createStore } from "zustand/vanilla";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { create } from "zustand";
-import { MeQueryQuery } from "@/graphql/types/graphql";
+import { UserMeQueryQuery } from "@/graphql/types/graphql";
 export type AuthState = {
-  user: MeQueryQuery["meQuery"] | undefined;
+  user: UserMeQueryQuery["UserMeQuery"] | undefined;
   loading: boolean;
   tokenWs?: string;
   hasHydrated: boolean;
 };
 
 export type AuthAction = {
-  setUser: (user: MeQueryQuery["meQuery"] | undefined) => void;
+  setUser: (user: UserMeQueryQuery["UserMeQuery"] | undefined) => void;
   setTokenWs: (tokenWs: string) => void;
   setLoading: (loading: boolean) => void;
   logout: () => void;
@@ -29,7 +29,7 @@ export const createAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       ...defaultInitState,
-      setUser: (user: MeQueryQuery["meQuery"] | undefined) =>
+      setUser: (user: UserMeQueryQuery["UserMeQuery"] | undefined) =>
         set(() => ({ user })),
       setLoading: (loading: boolean) =>
         set(() => ({
@@ -46,9 +46,9 @@ export const createAuthStore = create<AuthStore>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => sessionStorage),
-      onRehydrateStorage: () => (state,error) => {
+      onRehydrateStorage: () => (state, error) => {
         if (!error && state) {
-          state.setHasHydrated(true)
+          state.setHasHydrated(true);
         }
       },
     }

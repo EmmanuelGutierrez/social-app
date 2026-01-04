@@ -17,7 +17,7 @@ export default function SuggestedUsers() {
 
     const handleFollow = async (userId: string) => {
         const res = await followUser(userId)
-        if (res?.followUser) {
+        if (res?.UserFollowUser) {
             setFollowingUsers((prev) => [...prev, userId])
         }
     }
@@ -31,13 +31,13 @@ export default function SuggestedUsers() {
         <div className="sticky top-4 h-fit">
             {suggestedUsersLoading ? <div className="flex justify-center items-center">
                 <Loader2 className="animate-spin" />
-            </div> : suggestedUsers?.suggestedUsers?.length === 0 ? <p>No hay sugerencias</p> : <div>
+            </div> : suggestedUsers?.length === 0 ? <p>No hay sugerencias</p> : <div>
                 <Card className="border-border/20 ">
                     <CardHeader>
                         <h3 className="font-semibold text-lg">Sugerencias para ti</h3>
                     </CardHeader>
                     <CardContent>
-                        {suggestedUsers?.suggestedUsers?.map((user) =>
+                        {suggestedUsers?.map((user) =>
                             <div key={user._id} className="my-4 space-x-4 flex bg-primary-dark/25 p-2 rounded-4xl justify-center items-center">
                                 <Avatar className="cursor-pointer" onClick={handleRedirectUserProfile(user.username)}>
                                     <AvatarImage src={user.profileImg?.secure_url} alt={user.name} />
