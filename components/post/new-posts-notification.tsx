@@ -11,6 +11,7 @@ export const NewPostsNotification = () => {
     const { notifications, setNewNotificationsData, setNotifications, clearsetNewNotificationsData } = useNotification()
     const { getPostsByIds, getPostsByIdsLoading } = usePost()
     useNotificationSubscription((data) => {
+        console.log('res',data.data)
         if (data.data?.subNewPosts) {
             setNewNotificationsData({
                 authorId: data.data.subNewPosts.authorId,
@@ -23,6 +24,7 @@ export const NewPostsNotification = () => {
 
     useEffect(() => {
         const id = setInterval(() => {
+            console.log('setNotifications')
             setNotifications()
         }, 1000 * 60);
         return () => clearInterval(id);

@@ -1,0 +1,12 @@
+query UserFindUser($limit: Float!, $query: String!) {
+  UserFindUser(limit: $limit, query: $query) {
+    _id
+    name
+    lastname
+    username
+    profileImg {
+      _id
+      secure_url
+    }
+  }
+}

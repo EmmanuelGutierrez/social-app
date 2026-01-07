@@ -49,7 +49,7 @@ const formSchema = z.object({
 export function UpdateUserForm({
     userData,
 }: {
-    userData: UserByUsernameQuery['userByUsername']['user']
+    userData: UserByUsernameQuery['UserByUsername']['user']
 }) {
     // const router = useRouter();
     const [openCalendar, setOpenCalendar] = useState(false);

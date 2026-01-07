@@ -25,7 +25,7 @@ const updateFeed = (
 ) => {
   cache.modify({
     fields: {
-      myFeed: (existing, {}) => {
+      PostMyFeed: (existing, {}) => {
         console.log("Post feed", existing);
         const newFeedPost = {
           iLiked: false,
@@ -51,7 +51,7 @@ const updateReplies = (
 ) => {
   cache.modify({
     fields: {
-      postAndAllComments: (existing, {}) => {
+      PostGetPostAndAllComments: (existing, {}) => {
         const newRepliesPost = {
           iLiked: false,
           post: newPost.data?.PostCreatePost,
@@ -85,7 +85,7 @@ const mergeMoreReplies = (
 ) => {
   cache.modify({
     fields: {
-      postAndAllComments: (existing, {}) => {
+      PostGetPostAndAllComments: (existing, {}) => {
         if (!newReplies.data?.PostGetComments) {
           return existing;
         }
@@ -113,7 +113,7 @@ const mergeAncestorsComments = (
 ) => {
   cache.modify({
     fields: {
-      postAndAllComments: (existing, {}) => {
+      PostGetPostAndAllComments: (existing, {}) => {
         if (!newAncestorsComments.data?.PostGetAncestorsComments) {
           return existing;
         }
@@ -138,7 +138,7 @@ const mergePostsByIds = (
 ) => {
   cache.modify({
     fields: {
-      myFeed: (existing) => {
+      PostMyFeed: (existing) => {
         if (!newPosts.data?.PostGetPostsByIds) {
           return existing;
         }

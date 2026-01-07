@@ -26,6 +26,7 @@ export const useAuth = () => {
     onCompleted: async (data) => {
       if (data?.AuthRegister.tokenWs) {
         setTokenWs(data.AuthRegister.tokenWs);
+        localStorage.setItem("tokenWs", data?.AuthRegister.tokenWs);
         const meRes = await meQuery();
         setUser(meRes.data?.UserMeQuery);
       }
@@ -80,6 +81,7 @@ export const useAuth = () => {
     setIsLoading(true);
     await logoutMutation();
     logout();
+    localStorage.removeItem("tokenWs");
     setIsLoading(false);
   };
 

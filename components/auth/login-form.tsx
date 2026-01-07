@@ -18,16 +18,16 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { useAuth } from "@/hooks/useAuth";
-import {useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  email: z.string(),
-  password: z.string(),
+  email: z.string().nonempty({ message: "El correo es requerido" }),
+  password: z.string().nonempty({ message: "La contraseña es requerida" }),
 });
 
 export function LoginForm() {
   // const [loading, setLoading] = useState(false);
-  const router=useRouter()
+  const router = useRouter();
   const { handleSubmit, control } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "", password: "" },
@@ -36,9 +36,9 @@ export function LoginForm() {
   async function onSubmit(dataForm: z.infer<typeof formSchema>) {
     try {
       // setLoading(true);
-      const res=await login(dataForm);
-      if(!res.data?.AuthLogin.tokenWs){
-       throw new Error("Error al iniciar sesión") 
+      const res = await login(dataForm);
+      if (!res.data?.AuthLogin.tokenWs) {
+        throw new Error("Error al iniciar sesión");
       }
       toast.success("You submitted the following values:", {
         description: (

@@ -27,14 +27,28 @@ import { Calendar } from "../ui/calendar";
 import AvatarUploadEditButton from "../common/upload-profile-img";
 
 const formSchema = z.object({
-  email: z.email(),
-  password: z.string().min(8),
-  name: z.string().min(2),
-  lastname: z.string().min(2),
-  username: z.string().min(2),
+  email: z.email().nonempty({ message: "El correo es requerido" }),
+  password: z
+    .string()
+    .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
+    .nonempty({ message: "La contraseña es requerida" }),
+  name: z
+    .string()
+    .min(2, { message: "El nombre debe tener al menos 2 caracteres" })
+    .nonempty({ message: "El nombre es requerido" }),
+  lastname: z
+    .string()
+    .min(2, { message: "El apellido debe tener al menos 2 caracteres" })
+    .nonempty({ message: "El apellido es requerido" }),
+  username: z
+    .string()
+    .min(2, {
+      message: "El nombre de usuario debe tener al menos 2 caracteres",
+    })
+    .nonempty({ message: "El nombre de usuario es requerido" }),
   birth_date: z.date(),
   file: z
-    .file('Error al subir el archivo')
+    .file("Error al subir el archivo")
     .refine((files) => {
       console.log("FILES", files);
       return !files || files.size <= 2 * 1024 * 1024;
@@ -44,12 +58,13 @@ const formSchema = z.object({
         !files ||
         ["image/jpeg", "image/png", "image/webp"].includes(files.type),
       "Formato incorrecto"
-    ).optional(),
+    )
+    .optional(),
 });
 export function RegisterForm() {
   const router = useRouter();
   const [openCalendar, setOpenCalendar] = useState(false);
-  const { handleSubmit, control, } = useForm<z.infer<typeof formSchema>>({
+  const { handleSubmit, control } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -114,8 +129,8 @@ export function RegisterForm() {
   return (
     <Card className="w-full text-white">
       <CardHeader>
-        <CardTitle>Register Now!</CardTitle>
-        <CardDescription>Create your account to get started</CardDescription>
+        <CardTitle>Registrate!</CardTitle>
+        <CardDescription>Crear tu cuenta para comenzar</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -177,7 +192,6 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2 ">
-
             <Controller
               name="file"
               control={control}
@@ -193,15 +207,15 @@ export function RegisterForm() {
                     ref={field.ref}
                     multiple={false}
                     onBlur={field.onBlur}
-                  // onChange={(e) => {
-                  //   console.log("file eve", e.target);
-                  //   // const files = e.target.files;
-                  //   // if (files) {
-                  //   //   // console.log('files',files[0].arrayBuffer)
-                  //   //   // field.onChange(files[0]);
-                  //   //   // setPreview(URL.createObjectURL(files[0]));
-                  //   // }
-                  // }}
+                    // onChange={(e) => {
+                    //   console.log("file eve", e.target);
+                    //   // const files = e.target.files;
+                    //   // if (files) {
+                    //   //   // console.log('files',files[0].arrayBuffer)
+                    //   //   // field.onChange(files[0]);
+                    //   //   // setPreview(URL.createObjectURL(files[0]));
+                    //   // }
+                    // }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -326,8 +340,12 @@ export function RegisterForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={!!user || loadingRegister}>
-            {!!user || loadingRegister ? "Creating account..." : "Register Now"}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={!!user || loadingRegister}
+          >
+            {!!user || loadingRegister ? "Creando cuenta..." : "Registrarse"}
           </Button>
         </form>
       </CardContent>

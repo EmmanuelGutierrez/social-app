@@ -1,5 +1,5 @@
 "use client";
-import { Bell, LogOut, Settings, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,18 +49,18 @@ export const UserDropdown = () => {
         <DropdownMenuContent>
           <DropdownMenuLabel>@{user?.username}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`/profile/${user?.username}`)}>
             <User />
             Perfil
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          {/* <DropdownMenuItem>
             <Bell />
             Notificaciones
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings />
             Configuracion
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut />
             Cerrar sesion

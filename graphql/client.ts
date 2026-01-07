@@ -30,21 +30,19 @@ const wsLink = new GraphQLWsLink(
     url: `${
       process.env["BACKEND_WS_URL"] ?? process.env["NEXT_PUBLIC_BACKEND_WS_URL"]
     }/graphql`,
-    on:{
-      connected(){
-        console.log("CWS onnected")
+    on: {
+      connected() {
+        console.log("CWS onnected");
       },
-      error(){
-        console.log("WS Error")
+      error() {
+        console.log("WS Error");
       },
-      closed(){
-        console.log("WS Closed")
-      }
-      
+      closed() {
+        console.log("WS Closed");
+      },
     },
     connectionParams() {
-      const token= localStorage.getItem("tokenWs")
-      console.log("TOKEN WS", token)
+      const token = localStorage.getItem("tokenWs");
       return {
         Authorization: `${token}`,
       };
@@ -86,20 +84,13 @@ async function refreshAccessToken() {
 }
 
 const errorLink = new ErrorLink(({ forward, error, operation }) => {
-  console.log("ERROR 1", error.message, error.name, error.stack);
-
   let isAuthError = false;
 
   if (error) {
-    isAuthError = ["unauthenticated", "unauthorized"].includes(
-      error.message.toLowerCase()
-    );
-    console.log(
-      "IS AUTH ERROR",
-      isAuthError,
-      ["unauthenticated", "unauthorized"].includes(error.message.toLowerCase()),
-      error.message.toLowerCase()
-    );
+    isAuthError =
+      ["unauthenticated", "unauthorized"].includes(
+        error.message.toLowerCase()
+      ) && operation.operationName !== "AuthLogin";
   }
 
   if (!error) {
@@ -166,7 +157,6 @@ export const apolloClient = new ApolloClient({
         //       const existingIds = existing.data.map(
         //         (post) => post.post.__ref || `Post:${post.post._id}`
         //       );
-
         //       const data = [
         //         ...existing.data,
         //         ...incoming.data.filter(

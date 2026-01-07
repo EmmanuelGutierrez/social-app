@@ -2,12 +2,6 @@ mutation PostCreatePost($data: CreatePostInput!, $files: [Upload!]!) {
   PostCreatePost(data: $data, files: $files) {
     _id
     reactionsCount
-    replyTo {
-      _id
-      authorId {
-        _id
-      }
-    }
     authorId {
       _id
       username
@@ -20,6 +14,7 @@ mutation PostCreatePost($data: CreatePostInput!, $files: [Upload!]!) {
       }
     }
     body
+    status
     createdAt
     images {
       _id
@@ -28,5 +23,12 @@ mutation PostCreatePost($data: CreatePostInput!, $files: [Upload!]!) {
     }
     tags
     title
+    replyTo {
+      _id
+      authorId {
+        username
+        _id
+      }
+    }
   }
 }

@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Smile, Send, X, ImageIcon } from "lucide-react";
+import { Smile, Send, X, ImageIcon, Loader2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -34,7 +34,7 @@ const formSchema = z.object({
 
 export function CreatePostForm({ replyTo }: { replyTo?: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { createPost } = usePost();
+  const { createPost, createPostLoading } = usePost();
   const { user } = useAuth();
 
   const { handleSubmit, control, formState, setValue, getValues, reset } =
@@ -111,11 +111,6 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
   // }
 
   const maxLength = 500;
-  console.log(
-    "formWatched",
-    formWatched,
-    formWatched.body?.length || 0 / maxLength
-  );
   const progress = ((formWatched.body?.length || 0) / maxLength) * 100;
   return (
     <div className="">
@@ -297,10 +292,14 @@ export function CreatePostForm({ replyTo }: { replyTo?: string }) {
                   </div>
                   <Button
                     type="submit"
-                    disabled={!formState.isValid}
+                    disabled={!formState.isValid || createPostLoading}
                     className="h-12  rounded-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   >
-                    <Send className="size-5" />
+                    {createPostLoading ? (
+                      <Loader2 className="size-5 animate-spin" />
+                    ) : (
+                      <Send className="size-5" />
+                    )}
                     Postear
                   </Button>
                 </div>
